@@ -21,6 +21,8 @@ function ToolsTab() {
     snapToGrid,
     setGridVisible,
     setSnapToGrid,
+    pathVisible,
+    setPathVisible,
     selectedObjectId,
     removeSelectedObject,
     undo,
@@ -83,7 +85,12 @@ function ToolsTab() {
             스냅
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-300">
-            <input type="checkbox" disabled className="rounded" />
+            <input
+              type="checkbox"
+              checked={pathVisible}
+              onChange={(e) => setPathVisible(e.target.checked)}
+              className="rounded"
+            />
             경로 표시
           </label>
         </div>

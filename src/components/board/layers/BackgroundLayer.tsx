@@ -7,10 +7,44 @@ import {
   LINES,
   FIELD_COLOR,
   PIXELS_PER_METER,
+  GRID_SIZE,
+  GRID_COLOR,
 } from '@/constants/field';
+import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 
 function BackgroundLayer() {
+  const { gridVisible } = useTacticalBoardStore();
   const toPixel = (meters: number) => meters * PIXELS_PER_METER;
+  const verticalLines = gridVisible
+    ? Array.from({ length: Math.floor(CANVAS_WIDTH / GRID_SIZE) }, (_, index) => (
+        <Line
+          key={`grid-v-${index}`}
+          points={[
+            (index + 1) * GRID_SIZE,
+            0,
+            (index + 1) * GRID_SIZE,
+            CANVAS_HEIGHT,
+          ]}
+          stroke={GRID_COLOR}
+          strokeWidth={1}
+        />
+      ))
+    : null;
+  const horizontalLines = gridVisible
+    ? Array.from({ length: Math.floor(CANVAS_HEIGHT / GRID_SIZE) }, (_, index) => (
+        <Line
+          key={`grid-h-${index}`}
+          points={[
+            0,
+            (index + 1) * GRID_SIZE,
+            CANVAS_WIDTH,
+            (index + 1) * GRID_SIZE,
+          ]}
+          stroke={GRID_COLOR}
+          strokeWidth={1}
+        />
+      ))
+    : null;
 
   return (
     <Layer>
@@ -19,6 +53,9 @@ function BackgroundLayer() {
         height={CANVAS_HEIGHT}
         fill={FIELD_COLOR}
       />
+
+      {verticalLines}
+      {horizontalLines}
 
       <Line
         points={[toPixel(LINES.centerX), 0, toPixel(LINES.centerX), CANVAS_HEIGHT]}

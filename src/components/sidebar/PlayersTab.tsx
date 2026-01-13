@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { Player } from '@/types/player';
 import { FIELD_WIDTH, FIELD_HEIGHT, PIXELS_PER_METER } from '@/constants/field';
+import { snapValue } from '@/utils/grid';
 
 function PlayersTab() {
   const [number, setNumber] = useState('');
@@ -9,7 +10,7 @@ function PlayersTab() {
   const [position, setPosition] = useState<'GK' | 'DF' | 'MF' | 'FW'>('MF');
   const [team, setTeam] = useState<'home' | 'away'>('home');
 
-  const { players, addPlayer, removePlayer } = useTacticalBoardStore();
+  const { players, addPlayer, removePlayer, snapToGrid } = useTacticalBoardStore();
 
   const teamColors = {
     home: '#e63946',
@@ -29,8 +30,8 @@ function PlayersTab() {
       position,
       team,
       color: teamColors[team],
-      x: (FIELD_WIDTH * PIXELS_PER_METER) / 2,
-      y: (FIELD_HEIGHT * PIXELS_PER_METER) / 2,
+      x: snapValue((FIELD_WIDTH * PIXELS_PER_METER) / 2, snapToGrid),
+      y: snapValue((FIELD_HEIGHT * PIXELS_PER_METER) / 2, snapToGrid),
     };
 
     addPlayer(newPlayer);

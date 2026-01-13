@@ -1,16 +1,20 @@
 import { Layer } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
+import { snapValue } from '@/utils/grid';
 import PlayerIcon from '../PlayerIcon';
 
 function PlayerLayer() {
-  const { players, selectedObjectId, updatePlayer } = useTacticalBoardStore();
+  const { players, selectedObjectId, updatePlayer, snapToGrid } = useTacticalBoardStore();
 
   const handleSelect = (playerId: string) => {
     useTacticalBoardStore.getState().setSelectedObject(playerId);
   };
 
   const handleDragEnd = (playerId: string) => (x: number, y: number) => {
-    updatePlayer(playerId, { x, y });
+    updatePlayer(playerId, {
+      x: snapValue(x, snapToGrid),
+      y: snapValue(y, snapToGrid),
+    });
   };
 
   return (

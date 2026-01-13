@@ -7,9 +7,10 @@ import PlayerLayer from './layers/PlayerLayer';
 import ShapeLayer from './layers/ShapeLayer';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/constants/field';
 import { Shape } from '@/types/shape';
+import { snapValue } from '@/utils/grid';
 
 function TacticalBoard() {
-  const { zoom, pan, setSelectedObject, addShape } = useTacticalBoardStore();
+  const { zoom, pan, setSelectedObject, addShape, snapToGrid } = useTacticalBoardStore();
   const {
     activeTool,
     arrowColor,
@@ -26,11 +27,13 @@ function TacticalBoard() {
     if (activeTool && !isDrawing) {
       setIsDrawing(true);
       const pos = e.target.getStage().getPointerPosition();
-      setDrawingPoints([pos.x - pan.x, pos.y - pan.y]);
+      const startX = snapValue(pos.x - pan.x, snapToGrid);
+      const startY = snapValue(pos.y - pan.y, snapToGrid);
+      setDrawingPoints([startX, startY]);
     } else if (isDrawing) {
       const pos = e.target.getStage().getPointerPosition();
-      const endX = pos.x - pan.x;
-      const endY = pos.y - pan.y;
+      const endX = snapValue(pos.x - pan.x, snapToGrid);
+      const endY = snapValue(pos.y - pan.y, snapToGrid);
 
       if (activeTool === 'rect') {
         const newShape: Shape = {
@@ -85,11 +88,13 @@ function TacticalBoard() {
   const handleStageMouseMove = (e: any) => {
     if (isDrawing && activeTool) {
       const pos = e.target.getStage().getPointerPosition();
+      const nextX = snapValue(pos.x - pan.x, snapToGrid);
+      const nextY = snapValue(pos.y - pan.y, snapToGrid);
       setDrawingPoints([
         drawingPoints[0],
         drawingPoints[1],
-        pos.x - pan.x,
-        pos.y - pan.y,
+        nextX,
+        nextY,
       ]);
     }
   };
