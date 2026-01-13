@@ -1,0 +1,124 @@
+import { useState } from 'react';
+import { Stage } from 'react-konva';
+import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
+import { useUIStore } from '@/store/uiStore';
+import BackgroundLayer from './layers/BackgroundLayer';
+import PlayerLayer from './layers/PlayerLayer';
+import ShapeLayer from './layers/ShapeLayer';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/constants/field';
+import { Shape } from '@/types/shape';
+
+function TacticalBoard() {
+  const { zoom, pan, setSelectedObject, addShape } = useTacticalBoardStore();
+  const {
+    activeTool,
+    arrowColor,
+    arrowStrokeWidth,
+    arrowStyle,
+    arrowPointerLength,
+    arrowPointerWidth,
+  } = useUIStore();
+
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [drawingPoints, setDrawingPoints] = useState<number[]>([]);
+
+  const handleStageClick = (e: any) => {
+    if (activeTool && !isDrawing) {
+      setIsDrawing(true);
+      const pos = e.target.getStage().getPointerPosition();
+      setDrawingPoints([pos.x - pan.x, pos.y - pan.y]);
+    } else if (isDrawing) {
+      const pos = e.target.getStage().getPointerPosition();
+      const endX = pos.x - pan.x;
+      const endY = pos.y - pan.y;
+
+      if (activeTool === 'rect') {
+        const newShape: Shape = {
+          id: `shape-${Date.now()}`,
+          type: 'rect',
+          points: [
+            drawingPoints[0],
+            drawingPoints[1],
+            endX - drawingPoints[0],
+            endY - drawingPoints[1],
+          ],
+          color: '#ffffff',
+          strokeWidth: 2,
+        };
+        addShape(newShape);
+        setIsDrawing(false);
+        setDrawingPoints([]);
+      } else if (activeTool === 'circle') {
+        const radius = Math.sqrt(
+          Math.pow(endX - drawingPoints[0], 2) + Math.pow(endY - drawingPoints[1], 2)
+        );
+        const newShape: Shape = {
+          id: `shape-${Date.now()}`,
+          type: 'circle',
+          points: [drawingPoints[0], drawingPoints[1], radius],
+          color: '#ffffff',
+          strokeWidth: 2,
+        };
+        addShape(newShape);
+        setIsDrawing(false);
+        setDrawingPoints([]);
+      } else if (activeTool === 'line' || activeTool === 'arrow') {
+        const newShape: Shape = {
+          id: `shape-${Date.now()}`,
+          type: activeTool as any,
+          points: [drawingPoints[0], drawingPoints[1], endX, endY],
+          color: activeTool === 'arrow' ? arrowColor : '#ffffff',
+          strokeWidth: activeTool === 'arrow' ? arrowStrokeWidth : 2,
+          dash: activeTool === 'arrow' && arrowStyle === 'dashed' ? [8, 6] : undefined,
+          pointerLength: activeTool === 'arrow' ? arrowPointerLength : undefined,
+          pointerWidth: activeTool === 'arrow' ? arrowPointerWidth : undefined,
+        };
+        addShape(newShape);
+        setIsDrawing(false);
+        setDrawingPoints([]);
+      }
+    } else {
+      setSelectedObject(null);
+    }
+  };
+
+  const handleStageMouseMove = (e: any) => {
+    if (isDrawing && activeTool) {
+      const pos = e.target.getStage().getPointerPosition();
+      setDrawingPoints([
+        drawingPoints[0],
+        drawingPoints[1],
+        pos.x - pan.x,
+        pos.y - pan.y,
+      ]);
+    }
+  };
+
+  const handleDoubleClick = () => {
+    setIsDrawing(false);
+    setDrawingPoints([]);
+    useUIStore.getState().setActiveTool(null);
+  };
+
+  return (
+    <div className="flex-1 bg-gray-900 relative overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Stage
+          width={CANVAS_WIDTH * zoom}
+          height={CANVAS_HEIGHT * zoom}
+          scaleX={zoom}
+          scaleY={zoom}
+          onClick={handleStageClick}
+          onMouseMove={handleStageMouseMove}
+          onDblClick={handleDoubleClick}
+        >
+          <BackgroundLayer />
+          <ShapeLayer drawingPoints={drawingPoints} activeTool={activeTool} />
+          <PlayerLayer />
+        </Stage>
+      </div>
+    </div>
+  );
+}
+
+export default TacticalBoard;
