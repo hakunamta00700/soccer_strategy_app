@@ -8,7 +8,7 @@ interface ShapeLayerProps {
 }
 
 function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
-  const { shapes, selectedObjectId, setSelectedObject, pathVisible } = useTacticalBoardStore();
+  const { shapes, selectedObjectId, setSelectedObject } = useTacticalBoardStore();
   const {
     arrowColor,
     arrowStrokeWidth,
@@ -119,9 +119,6 @@ function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
               />
             );
           case 'line':
-            if (!pathVisible) {
-              return null;
-            }
             return (
               <Line
                 key={shape.id}
@@ -133,9 +130,6 @@ function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
               />
             );
           case 'arrow':
-            if (!pathVisible) {
-              return null;
-            }
             return (
               <Arrow
                 key={shape.id}

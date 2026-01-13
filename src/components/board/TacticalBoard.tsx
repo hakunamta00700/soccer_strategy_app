@@ -5,6 +5,7 @@ import { useUIStore } from '@/store/uiStore';
 import BackgroundLayer from './layers/BackgroundLayer';
 import PlayerLayer from './layers/PlayerLayer';
 import ShapeLayer from './layers/ShapeLayer';
+import PathLayer from './layers/PathLayer';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/constants/field';
 import { Shape } from '@/types/shape';
 import { snapValue } from '@/utils/grid';
@@ -119,6 +120,7 @@ function TacticalBoard() {
         >
           <BackgroundLayer />
           <ShapeLayer drawingPoints={drawingPoints} activeTool={activeTool} />
+          <PathLayer />
           <PlayerLayer />
         </Stage>
       </div>

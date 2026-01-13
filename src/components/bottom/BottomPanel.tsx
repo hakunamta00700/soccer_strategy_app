@@ -1,23 +1,15 @@
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
-import { useUIStore } from '@/store/uiStore';
 import { Player } from '@/types/player';
+import AnimationPanel from './AnimationPanel';
 
 function BottomPanel() {
   const { selectedObjectId, players, shapes, updatePlayer, updateShape, removeSelectedObject } =
     useTacticalBoardStore();
-  const { activeTool } = useUIStore();
-
   const selectedPlayer = players.find((p) => p.id === selectedObjectId);
   const selectedShape = shapes.find((shape) => shape.id === selectedObjectId);
 
   if (!selectedObjectId || (!selectedPlayer && !selectedShape)) {
-    return (
-      <div className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
-        <div className="text-sm text-gray-400">
-          {activeTool ? `도구: ${activeTool}` : '객체를 선택하세요'}
-        </div>
-      </div>
-    );
+    return <AnimationPanel />;
   }
 
   if (selectedShape && selectedShape.type === 'arrow') {
@@ -124,11 +116,7 @@ function BottomPanel() {
   }
 
   if (!selectedPlayer) {
-    return (
-      <div className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
-        <div className="text-sm text-gray-400">객체를 선택하세요</div>
-      </div>
-    );
+    return <AnimationPanel />;
   }
 
   const handlePlayerUpdate = (field: keyof Player, value: Player[keyof Player]) => {

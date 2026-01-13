@@ -43,6 +43,8 @@ interface TacticalBoardState {
   removeSelectedObject: () => void;
   undo: () => void;
   redo: () => void;
+  setPlayers: (players: Player[]) => void;
+  setShapes: (shapes: Shape[]) => void;
   setSelectedObject: (id: string | null) => void;
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
@@ -156,6 +158,8 @@ export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
         selectedObjectId: null,
       };
     }),
+  setPlayers: (players) => set({ players: clonePlayers(players) }),
+  setShapes: (shapes) => set({ shapes: cloneShapes(shapes) }),
   setSelectedObject: (id) => set({ selectedObjectId: id }),
   setZoom: (zoom) => set({ zoom }),
   setPan: (pan) => set({ pan }),
