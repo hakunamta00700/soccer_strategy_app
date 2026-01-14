@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Header from './components/header/Header';
 import Sidebar from './components/sidebar/Sidebar';
 import TacticalBoard from './components/board/TacticalBoard';
@@ -6,9 +7,44 @@ import KeyboardShortcuts from './components/KeyboardShortcuts';
 import SettingsModal from './components/modals/SettingsModal';
 import { useUIStore } from './store/uiStore';
 import PlayerInfoPanel from './components/panels/PlayerInfoPanel';
+import SessionListModal from './components/modals/SessionListModal';
+import { storageService } from './services/storageService';
+import { useSessionStore } from './store/sessionStore';
+import { useTacticalBoardStore } from './store/tacticalBoardStore';
+import { useAnimationStore } from './store/animationStore';
 
 function App() {
   const { modalOpen, playerInfoLocation, playerInfoVisible } = useUIStore();
+  const { setSessions, setCurrentSession, setCurrentTactic } = useSessionStore();
+  const { setPlayers, setShapes, clearSelection } = useTacticalBoardStore();
+  const { setAnimations, setIsPlaying, setCurrentTime } = useAnimationStore();
+
+  useEffect(() => {
+    const loadSessions = async () => {
+      const sessions = await storageService.getSessions();
+      setSessions(sessions);
+
+      if (sessions.length === 0) {
+        return;
+      }
+
+      const sorted = [...sessions].sort(
+        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
+      );
+      const active = sorted[0];
+      const tactic = active.tactics[0] ?? null;
+      setCurrentSession(active.id);
+      setCurrentTactic(tactic?.id ?? null);
+      setPlayers(tactic?.players ?? []);
+      setShapes(tactic?.shapes ?? []);
+      setAnimations(tactic?.animations ?? []);
+      setIsPlaying(false);
+      setCurrentTime(0);
+      clearSelection();
+    };
+
+    loadSessions();
+  }, [setSessions, setCurrentSession, setCurrentTactic, setPlayers, setShapes, setAnimations, setIsPlaying, setCurrentTime, clearSelection]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-900">
@@ -27,6 +63,7 @@ function App() {
         </div>
       </div>
       {modalOpen === 'settings' && <SettingsModal />}
+      {modalOpen === 'sessionList' && <SessionListModal />}
       {playerInfoLocation === 'modal' && playerInfoVisible && (
         <PlayerInfoPanel variant="modal" />
       )}

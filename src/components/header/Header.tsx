@@ -36,9 +36,12 @@ function Header() {
     <header className="h-[60px] bg-gray-800 flex items-center justify-between px-6 border-b border-gray-700">
       <div className="flex items-center gap-4">
         <div className="text-xl font-bold text-white">⚽ 전술 보드</div>
-        <div className="text-gray-300">
+        <button
+          onClick={() => setModalOpen('sessionList')}
+          className="text-gray-300 hover:text-white text-sm"
+        >
           {currentSession ? currentSession.name : '세션 없음'}
-        </div>
+        </button>
       </div>
 
       <div className="flex items-center gap-4">
