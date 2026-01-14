@@ -6,12 +6,14 @@ import BackgroundLayer from './layers/BackgroundLayer';
 import PlayerLayer from './layers/PlayerLayer';
 import ShapeLayer from './layers/ShapeLayer';
 import PathLayer from './layers/PathLayer';
+import BallLayer from './layers/BallLayer';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/constants/field';
 import { Shape } from '@/types/shape';
 import { snapValue } from '@/utils/grid';
 
 function TacticalBoard() {
-  const { zoom, pan, setSelectedObject, addShape, snapToGrid } = useTacticalBoardStore();
+  const { zoom, pan, setSelectedObject, addShape, snapToGrid, clearSelection } =
+    useTacticalBoardStore();
   const {
     activeTool,
     arrowColor,
@@ -82,7 +84,11 @@ function TacticalBoard() {
         setDrawingPoints([]);
       }
     } else {
-      setSelectedObject(null);
+      if (e.target === e.target.getStage()) {
+        clearSelection();
+      } else {
+        setSelectedObject(null);
+      }
     }
   };
 
@@ -121,6 +127,7 @@ function TacticalBoard() {
           <BackgroundLayer />
           <ShapeLayer drawingPoints={drawingPoints} activeTool={activeTool} />
           <PathLayer />
+          <BallLayer />
           <PlayerLayer />
         </Stage>
       </div>

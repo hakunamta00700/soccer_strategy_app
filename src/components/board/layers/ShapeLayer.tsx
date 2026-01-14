@@ -8,7 +8,8 @@ interface ShapeLayerProps {
 }
 
 function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
-  const { shapes, selectedObjectId, setSelectedObject } = useTacticalBoardStore();
+  const { shapes, selectedObjectId, setSelectedObject, clearPlayerSelection } =
+    useTacticalBoardStore();
   const {
     arrowColor,
     arrowStrokeWidth,
@@ -83,6 +84,7 @@ function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
         const strokeWidth = isSelected ? shape.strokeWidth + 1 : shape.strokeWidth;
         const handleSelect = (e: any) => {
           e.cancelBubble = true;
+          clearPlayerSelection();
           setSelectedObject(shape.id);
         };
 

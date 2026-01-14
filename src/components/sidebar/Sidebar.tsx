@@ -2,6 +2,7 @@ import { useUIStore } from '@/store/uiStore';
 import PlayersTab from './PlayersTab';
 import ToolsTab from './ToolsTab';
 import TacticsTab from './TacticsTab';
+import FormationTab from './FormationTab';
 
 function Sidebar() {
   const { sidebarOpen, activeTab, setActiveTab } = useUIStore();
@@ -52,12 +53,23 @@ function Sidebar() {
         >
           전술
         </button>
+        <button
+          onClick={() => setActiveTab('formation')}
+          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            activeTab === 'formation'
+              ? 'bg-gray-700 text-white'
+              : 'text-gray-400 hover:text-white hover:bg-gray-750'
+          }`}
+        >
+          포메이션
+        </button>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'players' && <PlayersTab />}
         {activeTab === 'tools' && <ToolsTab />}
         {activeTab === 'tactics' && <TacticsTab />}
+        {activeTab === 'formation' && <FormationTab />}
       </div>
     </div>
   );

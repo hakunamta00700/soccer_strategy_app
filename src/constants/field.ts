@@ -23,13 +23,13 @@ export const LINES = {
   centerCircleRadius: 9.15, // 9.15m
 
   // 페널티 박스 (Large Box)
-  penaltyBoxWidth: 40.32, // 16.5m * 2 = 33m (가로 40.32m)
-  penaltyBoxHeight: 16.5,
+  penaltyBoxWidth: 16.5,
+  penaltyBoxHeight: 40.32,
   penaltyBoxDistance: 16.5, // 골 라인에서 페널티 박스까지의 거리
 
   // 골 에어리어 (Small Box)
-  goalAreaWidth: 18.32, // 5.5m * 2 = 11m (가로 18.32m)
-  goalAreaHeight: 5.5,
+  goalAreaWidth: 5.5,
+  goalAreaHeight: 18.32,
   goalAreaDistance: 5.5,
 
   // 페널티 스팟

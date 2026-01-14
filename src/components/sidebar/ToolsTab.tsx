@@ -5,6 +5,10 @@ function ToolsTab() {
   const {
     activeTool,
     setActiveTool,
+    playerViewMode,
+    positionFilter,
+    setPlayerViewMode,
+    setPositionFilter,
     arrowColor,
     arrowStrokeWidth,
     arrowStyle,
@@ -38,6 +42,21 @@ function ToolsTab() {
     { id: 'circle', label: '원', icon: '○' },
     { id: 'text', label: '텍스트', icon: 'T' },
   ] as const;
+
+  const positions = [
+    { id: 'GK', label: 'GK' },
+    { id: 'DF', label: 'DF' },
+    { id: 'MF', label: 'MF' },
+    { id: 'FW', label: 'FW' },
+  ] as const;
+
+  const togglePosition = (pos: (typeof positions)[number]['id']) => {
+    if (positionFilter.includes(pos)) {
+      setPositionFilter(positionFilter.filter((item) => item !== pos));
+    } else {
+      setPositionFilter([...positionFilter, pos]);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -93,6 +112,49 @@ function ToolsTab() {
             />
             경로 표시
           </label>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">선수 표시</h3>
+        <div className="bg-gray-700 p-3 rounded space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setPlayerViewMode('number')}
+              className={`px-2 py-2 rounded text-xs ${
+                playerViewMode === 'number'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-600 text-gray-200'
+              }`}
+            >
+              등번호
+            </button>
+            <button
+              onClick={() => setPlayerViewMode('photo')}
+              className={`px-2 py-2 rounded text-xs ${
+                playerViewMode === 'photo'
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-gray-600 text-gray-200'
+              }`}
+            >
+              얼굴+이름
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {positions.map((position) => (
+              <button
+                key={position.id}
+                onClick={() => togglePosition(position.id)}
+                className={`px-2 py-2 rounded text-xs ${
+                  positionFilter.includes(position.id)
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-gray-600 text-gray-200'
+                }`}
+              >
+                {position.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

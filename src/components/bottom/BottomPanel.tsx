@@ -1,14 +1,29 @@
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
+import { Ball } from '@/types/ball';
 import { Player } from '@/types/player';
 import AnimationPanel from './AnimationPanel';
 
 function BottomPanel() {
-  const { selectedObjectId, players, shapes, updatePlayer, updateShape, removeSelectedObject } =
-    useTacticalBoardStore();
+  const {
+    selectedObjectId,
+    players,
+    balls,
+    shapes,
+    selectedPlayerIds,
+    updatePlayer,
+    updateBall,
+    updateShape,
+    removeSelectedObject,
+  } = useTacticalBoardStore();
   const selectedPlayer = players.find((p) => p.id === selectedObjectId);
+  const selectedBall = balls.find((ball) => ball.id === selectedObjectId);
   const selectedShape = shapes.find((shape) => shape.id === selectedObjectId);
 
-  if (!selectedObjectId || (!selectedPlayer && !selectedShape)) {
+  if (!selectedObjectId || (!selectedPlayer && !selectedBall && !selectedShape)) {
+    return <AnimationPanel />;
+  }
+
+  if (selectedPlayerIds.length > 1) {
     return <AnimationPanel />;
   }
 
@@ -110,6 +125,70 @@ function BottomPanel() {
           >
             삭제
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedBall) {
+    const handleBallUpdate = (field: keyof Ball, value: Ball[keyof Ball]) => {
+      updateBall(selectedBall.id, { [field]: value });
+    };
+
+    return (
+      <div className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: selectedBall.color }} />
+          <h3 className="text-sm font-medium text-white">축구공 설정</h3>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4">
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">색상</label>
+            <input
+              type="color"
+              value={selectedBall.color}
+              onChange={(e) => handleBallUpdate('color', e.target.value)}
+              className="w-full px-2 py-1 bg-gray-700 rounded text-sm h-8"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">반지름</label>
+            <input
+              type="number"
+              min={4}
+              max={40}
+              value={selectedBall.radius}
+              onChange={(e) => handleBallUpdate('radius', Number(e.target.value))}
+              className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">X 위치</label>
+            <input
+              type="number"
+              value={Math.round(selectedBall.x)}
+              onChange={(e) => handleBallUpdate('x', parseFloat(e.target.value))}
+              className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Y 위치</label>
+            <input
+              type="number"
+              value={Math.round(selectedBall.y)}
+              onChange={(e) => handleBallUpdate('y', parseFloat(e.target.value))}
+              className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
+            />
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={removeSelectedObject}
+              className="w-full px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors"
+            >
+              삭제
+            </button>
+          </div>
         </div>
       </div>
     );

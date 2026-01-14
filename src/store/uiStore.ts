@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 
-export type TabType = 'players' | 'tools' | 'tactics';
+export type TabType = 'players' | 'tools' | 'tactics' | 'formation';
 export type ToolType = 'arrow' | 'line' | 'rect' | 'circle' | 'text' | null;
 export type ModalType = 'settings' | 'help' | 'sessionList' | null;
 export type StrokeStyle = 'solid' | 'dashed';
+export type PlayerViewMode = 'number' | 'photo';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -11,6 +12,8 @@ interface UIState {
   activeTool: ToolType;
   modalOpen: ModalType;
   saveStatus: 'saved' | 'saving' | 'unsaved';
+  playerViewMode: PlayerViewMode;
+  positionFilter: Array<'GK' | 'DF' | 'MF' | 'FW'>;
   arrowColor: string;
   arrowStrokeWidth: number;
   arrowStyle: StrokeStyle;
@@ -23,6 +26,8 @@ interface UIState {
   setActiveTool: (tool: ToolType) => void;
   setModalOpen: (modal: ModalType) => void;
   setSaveStatus: (status: 'saved' | 'saving' | 'unsaved') => void;
+  setPlayerViewMode: (mode: PlayerViewMode) => void;
+  setPositionFilter: (positions: Array<'GK' | 'DF' | 'MF' | 'FW'>) => void;
   setArrowColor: (color: string) => void;
   setArrowStrokeWidth: (width: number) => void;
   setArrowStyle: (style: StrokeStyle) => void;
@@ -36,6 +41,8 @@ export const useUIStore = create<UIState>((set) => ({
   activeTool: null,
   modalOpen: null,
   saveStatus: 'saved',
+  playerViewMode: 'number',
+  positionFilter: ['GK', 'DF', 'MF', 'FW'],
   arrowColor: '#ffffff',
   arrowStrokeWidth: 2,
   arrowStyle: 'solid',
@@ -47,6 +54,8 @@ export const useUIStore = create<UIState>((set) => ({
   setActiveTool: (tool) => set({ activeTool: tool }),
   setModalOpen: (modal) => set({ modalOpen: modal }),
   setSaveStatus: (status) => set({ saveStatus: status }),
+  setPlayerViewMode: (mode) => set({ playerViewMode: mode }),
+  setPositionFilter: (positions) => set({ positionFilter: positions }),
   setArrowColor: (color) => set({ arrowColor: color }),
   setArrowStrokeWidth: (width) => set({ arrowStrokeWidth: width }),
   setArrowStyle: (style) => set({ arrowStyle: style }),

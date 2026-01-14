@@ -63,12 +63,6 @@ function BackgroundLayer() {
         strokeWidth={LINE_WIDTH}
       />
 
-      <Line
-        points={[0, toPixel(LINES.centerY), CANVAS_WIDTH, toPixel(LINES.centerY)]}
-        stroke={LINE_COLOR}
-        strokeWidth={LINE_WIDTH}
-      />
-
       <Circle
         x={toPixel(LINES.centerX)}
         y={toPixel(LINES.centerY)}
@@ -132,25 +126,6 @@ function BackgroundLayer() {
         y={toPixel(LINES.centerY)}
         radius={3}
         fill={LINE_COLOR}
-      />
-
-      <Circle
-        x={toPixel(LINES.penaltySpotDistance)}
-        y={toPixel(LINES.centerY)}
-        radius={toPixel(LINES.penaltyArcRadius)}
-        stroke={LINE_COLOR}
-        strokeWidth={LINE_WIDTH}
-        angle={-53.13}
-        clockwise
-      />
-
-      <Circle
-        x={CANVAS_WIDTH - toPixel(LINES.penaltySpotDistance)}
-        y={toPixel(LINES.centerY)}
-        radius={toPixel(LINES.penaltyArcRadius)}
-        stroke={LINE_COLOR}
-        strokeWidth={LINE_WIDTH}
-        angle={126.87}
       />
 
       <Circle
