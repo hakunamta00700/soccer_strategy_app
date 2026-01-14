@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
+import Konva from 'konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 import BackgroundLayer from './layers/BackgroundLayer';
@@ -10,6 +11,7 @@ import BallLayer from './layers/BallLayer';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '@/constants/field';
 import { Shape } from '@/types/shape';
 import { snapValue } from '@/utils/grid';
+import { setBoardStage } from '@/services/boardExport';
 
 function TacticalBoard() {
   const {
@@ -49,9 +51,15 @@ function TacticalBoard() {
   const selectionStart = useRef<{ x: number; y: number } | null>(null);
   const selectionActive = useRef(false);
   const selectionDragged = useRef(false);
+  const stageRef = useRef<Konva.Stage>(null);
   const isPortrait = boardOrientation === 'portrait';
   const stageWidth = (isPortrait ? CANVAS_HEIGHT : CANVAS_WIDTH) * zoom;
   const stageHeight = (isPortrait ? CANVAS_WIDTH : CANVAS_HEIGHT) * zoom;
+
+  useEffect(() => {
+    setBoardStage(stageRef.current);
+    return () => setBoardStage(null);
+  }, []);
 
   const handleStageClick = (e: any) => {
     if (selectionDragged.current) {
@@ -272,6 +280,7 @@ function TacticalBoard() {
       </div>
       <div className="absolute inset-0 flex items-center justify-center">
         <Stage
+          ref={stageRef}
           width={stageWidth}
           height={stageHeight}
           scaleX={zoom}
