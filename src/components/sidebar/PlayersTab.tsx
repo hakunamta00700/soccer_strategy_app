@@ -39,8 +39,17 @@ function PlayersTab() {
     balls: true,
   });
 
-  const { players, balls, addPlayer, removePlayer, addBall, removeBall, updateBall, snapToGrid } =
-    useTacticalBoardStore();
+  const {
+    players,
+    balls,
+    addPlayer,
+    removePlayer,
+    addBall,
+    removeBall,
+    updateBall,
+    setPlayersWithHistory,
+    snapToGrid,
+  } = useTacticalBoardStore();
 
   const teamColors = {
     home: '#e63946',
@@ -75,6 +84,45 @@ function PlayersTab() {
       return upper;
     }
     return 'MF';
+  };
+
+  const toPixel = (meters: number) => meters * PIXELS_PER_METER;
+  const distribute = (count: number, min: number, max: number) => {
+    if (count <= 1) {
+      return [(min + max) / 2];
+    }
+    const step = (max - min) / (count - 1);
+    return Array.from({ length: count }, (_, index) => min + step * index);
+  };
+
+  const getLinePositions = (lines: number, isHome: boolean) => {
+    const half = FIELD_WIDTH / 2;
+    const margin = 6;
+    const start = isHome ? margin : half + margin;
+    const end = isHome ? half - margin : FIELD_WIDTH - margin;
+    const step = (end - start) / (lines + 1);
+    return Array.from({ length: lines }, (_, index) => start + step * (index + 1));
+  };
+
+  const getEntryPosition = (entry: RosterEntry) => {
+    const upper = entry.position.toUpperCase();
+    if (upper === 'GK' || upper === 'DF' || upper === 'MF' || upper === 'FW') {
+      return upper as Player['position'];
+    }
+    return null;
+  };
+
+  const pickEntries = (
+    pool: RosterEntry[],
+    count: number,
+    preferred: Player['position']
+  ) => {
+    const matched = pool.filter((entry) => getEntryPosition(entry) === preferred);
+    const others = pool.filter((entry) => getEntryPosition(entry) !== preferred);
+    const selected = [...matched, ...others].slice(0, count);
+    const selectedIds = new Set(selected.map((entry) => entry.playerId));
+    const remaining = pool.filter((entry) => !selectedIds.has(entry.playerId));
+    return { selected, remaining };
   };
 
   const mapRosterEntry = (entry: any): RosterEntry | null => {
@@ -207,6 +255,95 @@ function PlayersTab() {
           : [...rosterFilterAway, pos]
       );
     }
+  };
+
+  const handleAutoPlace = (side: RosterSide) => {
+    const entries = side === 'home' ? rosterHome : rosterAway;
+    if (entries.length === 0) {
+      alert('불러온 선수 리스트가 없습니다.');
+      return;
+    }
+
+    const filtered =
+      side === 'home'
+        ? filterRoster(entries, rosterFilterHome)
+        : filterRoster(entries, rosterFilterAway);
+
+    if (filtered.length === 0) {
+      alert('필터에 해당하는 선수가 없습니다.');
+      return;
+    }
+
+    const isHome = side === 'home';
+    const lines = [4, 4, 2];
+    const lineXs = getLinePositions(lines.length, isHome);
+    const minY = 8;
+    const maxY = FIELD_HEIGHT - 8;
+
+    const existingIds = new Set(players.map((player) => player.id));
+    const pool = [...filtered];
+    const keeper =
+      pool.find((entry) => getEntryPosition(entry) === 'GK') ?? pool[0] ?? null;
+    const poolWithoutKeeper = keeper ? pool.filter((entry) => entry !== keeper) : pool;
+
+    const newPlayers: Player[] = [];
+
+    if (keeper) {
+      const keeperX = isHome ? 6 : FIELD_WIDTH - 6;
+      const keeperY = FIELD_HEIGHT / 2;
+      const keeperId = keeper.playerId
+        ? `player-${side}-${keeper.playerId}`
+        : `player-${side}-${Date.now()}-gk`;
+      if (!existingIds.has(keeperId)) {
+        newPlayers.push({
+          id: keeperId,
+          number: Number(keeper.number) || 0,
+          name: keeper.name,
+          position: 'GK',
+          team: side,
+          color: teamColors[side],
+          imgUrl: keeper.imgUrl || undefined,
+          x: snapValue(toPixel(keeperX), snapToGrid),
+          y: snapValue(toPixel(keeperY), snapToGrid),
+        });
+      }
+    }
+
+    let remaining = poolWithoutKeeper;
+    lines.forEach((count, lineIndex) => {
+      const preferred =
+        lineIndex === 0 ? 'DF' : lineIndex === lines.length - 1 ? 'FW' : 'MF';
+      const pick = pickEntries(remaining, count, preferred);
+      remaining = pick.remaining;
+      const ys = distribute(count, minY, maxY);
+      pick.selected.forEach((entry, index) => {
+        const entryId = entry.playerId
+          ? `player-${side}-${entry.playerId}`
+          : `player-${side}-${Date.now()}-${lineIndex}-${index}`;
+        if (existingIds.has(entryId)) {
+          return;
+        }
+        newPlayers.push({
+          id: entryId,
+          number: Number(entry.number) || 0,
+          name: entry.name,
+          position: normalizePosition(entry.position),
+          team: side,
+          color: teamColors[side],
+          imgUrl: entry.imgUrl || undefined,
+          x: snapValue(toPixel(lineXs[lineIndex]), snapToGrid),
+          y: snapValue(toPixel(ys[index]), snapToGrid),
+        });
+      });
+    });
+
+    if (newPlayers.length === 0) {
+      alert('추가할 선수가 없습니다.');
+      return;
+    }
+
+    const nextPlayers = [...players, ...newPlayers].slice(0, players.length + 11);
+    setPlayersWithHistory(nextPlayers);
   };
 
   const rosterSummary = useMemo(
@@ -380,6 +517,12 @@ function PlayersTab() {
                   </button>
                   {sectionsOpen.rosterHome && (
                     <div className="space-y-2">
+                      <button
+                        onClick={() => handleAutoPlace('home')}
+                        className="w-full px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+                      >
+                        홈 11명 배치
+                      </button>
                       <div className="grid grid-cols-4 gap-2">
                         {positions.map((position) => (
                           <button
@@ -443,6 +586,12 @@ function PlayersTab() {
                   </button>
                   {sectionsOpen.rosterAway && (
                     <div className="space-y-2">
+                      <button
+                        onClick={() => handleAutoPlace('away')}
+                        className="w-full px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+                      >
+                        어웨이 11명 배치
+                      </button>
                       <div className="grid grid-cols-4 gap-2">
                         {positions.map((position) => (
                           <button
