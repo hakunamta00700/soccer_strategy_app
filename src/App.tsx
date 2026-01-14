@@ -2,7 +2,6 @@ import Header from './components/header/Header';
 import Sidebar from './components/sidebar/Sidebar';
 import TacticalBoard from './components/board/TacticalBoard';
 import BottomPanel from './components/bottom/BottomPanel';
-import DevSeedAnimation from './components/DevSeedAnimation';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
 import SettingsModal from './components/modals/SettingsModal';
 import { useUIStore } from './store/uiStore';
@@ -13,7 +12,6 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen bg-gray-900">
-      <DevSeedAnimation />
       <KeyboardShortcuts />
       <Header />
       <div className="flex flex-1 overflow-hidden">
