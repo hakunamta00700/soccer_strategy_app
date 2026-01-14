@@ -13,6 +13,7 @@ import { useSessionStore } from './store/sessionStore';
 import { useTacticalBoardStore } from './store/tacticalBoardStore';
 import { useAnimationStore } from './store/animationStore';
 import SessionPersistence from './components/SessionPersistence';
+import HelpModal from './components/modals/HelpModal';
 
 function App() {
   const { modalOpen, playerInfoLocation, playerInfoVisible, setSaveStatus } = useUIStore();
@@ -79,6 +80,7 @@ function App() {
         </div>
       </div>
       {modalOpen === 'settings' && <SettingsModal />}
+      {modalOpen === 'help' && <HelpModal />}
       {modalOpen === 'sessionList' && <SessionListModal />}
       {playerInfoLocation === 'modal' && playerInfoVisible && (
         <PlayerInfoPanel variant="modal" />
