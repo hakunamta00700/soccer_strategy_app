@@ -5,6 +5,8 @@ import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 import { Session, Tactic } from '@/types/session';
 
+let autoSaveFailureNotified = false;
+
 const buildTactic = (fallback?: Tactic): Tactic => ({
   id: fallback?.id ?? `tactic-${Date.now()}`,
   name: fallback?.name ?? '기본 전술',
@@ -14,6 +16,23 @@ const buildTactic = (fallback?: Tactic): Tactic => ({
   animations: fallback?.animations ?? [],
   createdAt: fallback?.createdAt ?? new Date(),
 });
+
+const getBoardThumbnail = () => {
+  if (typeof document === 'undefined') {
+    return undefined;
+  }
+
+  const canvas = document.querySelector('#tactical-board canvas');
+  if (!(canvas instanceof HTMLCanvasElement)) {
+    return undefined;
+  }
+
+  try {
+    return canvas.toDataURL('image/png');
+  } catch (error) {
+    return undefined;
+  }
+};
 
 const buildSessionSnapshot = (session: Session, tacticId: string | null) => {
   const board = useTacticalBoardStore.getState();
@@ -39,6 +58,7 @@ const buildSessionSnapshot = (session: Session, tacticId: string | null) => {
       ...session,
       updatedAt: now,
       tactics,
+      thumbnail: getBoardThumbnail() ?? session.thumbnail,
     },
     activeTacticId: updatedTactic.id,
   };
@@ -74,11 +94,15 @@ export const saveCurrentSession = async (mode: 'auto' | 'manual') => {
       tactics: snapshot.tactics,
     });
     ui.setSaveStatus('saved');
+    autoSaveFailureNotified = false;
     return true;
   } catch (error) {
     ui.setSaveStatus('unsaved');
     if (mode === 'manual') {
       window.alert('저장에 실패했습니다.');
+    } else if (!autoSaveFailureNotified) {
+      autoSaveFailureNotified = true;
+      window.alert('자동 저장에 실패했습니다.');
     }
     return false;
   }

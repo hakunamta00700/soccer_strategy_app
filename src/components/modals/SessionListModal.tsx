@@ -41,13 +41,38 @@ function SessionListModal() {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortKey, setSortKey] = useState<'updated' | 'created' | 'name'>('updated');
+  const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
 
   const sortedSessions = useMemo(
-    () =>
-      [...sessions].sort(
-        (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
-      ),
-    [sessions]
+    () => {
+      const query = searchQuery.trim().toLowerCase();
+      const filtered = query
+        ? sessions.filter((session) => {
+            const nameMatch = session.name.toLowerCase().includes(query);
+            const descMatch = session.description?.toLowerCase().includes(query) ?? false;
+            return nameMatch || descMatch;
+          })
+        : sessions;
+
+      const sorted = [...filtered].sort((a, b) => {
+        if (sortKey === 'name') {
+          return a.name.localeCompare(b.name);
+        }
+        if (sortKey === 'created') {
+          return a.createdAt.getTime() - b.createdAt.getTime();
+        }
+        return a.updatedAt.getTime() - b.updatedAt.getTime();
+      });
+
+      if (sortDirection === 'desc') {
+        sorted.reverse();
+      }
+
+      return sorted;
+    },
+    [sessions, searchQuery, sortKey, sortDirection]
   );
 
   const applyTactic = (tactic: Tactic | null) => {
@@ -178,6 +203,34 @@ function SessionListModal() {
           </div>
           <div className="space-y-3">
             <h3 className="text-xs font-medium text-gray-400">저장된 세션</h3>
+            <div className="flex flex-col gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded text-sm"
+                placeholder="세션 검색"
+              />
+              <div className="flex gap-2">
+                <select
+                  value={sortKey}
+                  onChange={(e) => setSortKey(e.target.value as 'updated' | 'created' | 'name')}
+                  className="flex-1 px-3 py-2 bg-gray-700 text-white rounded text-sm"
+                >
+                  <option value="updated">수정 날짜</option>
+                  <option value="created">생성 날짜</option>
+                  <option value="name">이름</option>
+                </select>
+                <button
+                  onClick={() =>
+                    setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                  }
+                  className="px-3 py-2 bg-gray-700 text-white rounded text-sm"
+                >
+                  {sortDirection === 'asc' ? '오름' : '내림'}
+                </button>
+              </div>
+            </div>
             <div className="space-y-2 max-h-[360px] overflow-y-auto">
               {sortedSessions.length === 0 ? (
                 <div className="text-xs text-gray-500">저장된 세션이 없습니다.</div>
@@ -191,11 +244,24 @@ function SessionListModal() {
                         : 'border-gray-700 bg-gray-750'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-white">{session.name}</div>
-                        <div className="text-[11px] text-gray-400">
-                          {session.updatedAt.toLocaleString()}
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-14 h-10 rounded bg-gray-600 overflow-hidden flex items-center justify-center text-[10px] text-gray-300">
+                          {session.thumbnail ? (
+                            <img
+                              src={session.thumbnail}
+                              alt={`${session.name} 썸네일`}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            '미리보기 없음'
+                          )}
+                        </div>
+                        <div>
+                          <div className="text-white">{session.name}</div>
+                          <div className="text-[11px] text-gray-400">
+                            {session.updatedAt.toLocaleString()}
+                          </div>
                         </div>
                       </div>
                       <div className="flex gap-2">

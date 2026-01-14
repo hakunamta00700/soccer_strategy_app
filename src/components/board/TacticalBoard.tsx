@@ -259,7 +259,7 @@ function TacticalBoard() {
   };
 
   return (
-    <div className="flex-1 bg-gray-900 relative overflow-hidden">
+    <div id="tactical-board" className="flex-1 bg-gray-900 relative overflow-hidden">
       <div className="absolute top-3 left-3 z-10 flex items-center gap-3 text-xs text-gray-200 bg-gray-800/80 px-3 py-1 rounded">
         <span className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
