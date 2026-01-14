@@ -4,7 +4,13 @@ import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { FIELD_COLOR, LINE_COLOR } from '@/constants/field';
 
 function SettingsModal() {
-  const { setModalOpen, playerInfoLocation, setPlayerInfoLocation } = useUIStore();
+  const {
+    setModalOpen,
+    playerInfoLocation,
+    setPlayerInfoLocation,
+    playerInfoVisible,
+    setPlayerInfoVisible,
+  } = useUIStore();
   const {
     fieldColor,
     lineColor,
@@ -116,6 +122,15 @@ function SettingsModal() {
                 팝업
               </button>
             </div>
+            <label className="flex items-center gap-2 text-xs text-gray-300">
+              <input
+                type="checkbox"
+                checked={playerInfoVisible}
+                onChange={(e) => setPlayerInfoVisible(e.target.checked)}
+                className="rounded"
+              />
+              선수 정보 패널 표시
+            </label>
           </div>
         </div>
         <div className="flex items-center justify-between px-4 py-3 border-t border-gray-700">

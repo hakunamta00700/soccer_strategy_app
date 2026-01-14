@@ -143,8 +143,8 @@ function PlayerInfoPanel({ variant }: { variant: PanelVariant }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-full max-w-md">{content}</div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+      <div className="w-full max-w-md pointer-events-auto">{content}</div>
     </div>
   );
 }

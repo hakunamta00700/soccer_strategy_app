@@ -19,6 +19,7 @@ interface UIState {
   boardOrientation: BoardOrientation;
   animationPanelVisible: boolean;
   playerInfoLocation: PlayerInfoLocation;
+  playerInfoVisible: boolean;
   arrowColor: string;
   arrowStrokeWidth: number;
   arrowStyle: StrokeStyle;
@@ -40,6 +41,7 @@ interface UIState {
   setBoardOrientation: (orientation: BoardOrientation) => void;
   setAnimationPanelVisible: (visible: boolean) => void;
   setPlayerInfoLocation: (location: PlayerInfoLocation) => void;
+  setPlayerInfoVisible: (visible: boolean) => void;
   setArrowColor: (color: string) => void;
   setArrowStrokeWidth: (width: number) => void;
   setArrowStyle: (style: StrokeStyle) => void;
@@ -62,6 +64,7 @@ export const useUIStore = create<UIState>((set) => ({
   boardOrientation: 'landscape',
   animationPanelVisible: false,
   playerInfoLocation: 'sidebar',
+  playerInfoVisible: true,
   arrowColor: '#ffffff',
   arrowStrokeWidth: 2,
   arrowStyle: 'solid',
@@ -82,6 +85,7 @@ export const useUIStore = create<UIState>((set) => ({
   setBoardOrientation: (orientation) => set({ boardOrientation: orientation }),
   setAnimationPanelVisible: (visible) => set({ animationPanelVisible: visible }),
   setPlayerInfoLocation: (location) => set({ playerInfoLocation: location }),
+  setPlayerInfoVisible: (visible) => set({ playerInfoVisible: visible }),
   setArrowColor: (color) => set({ arrowColor: color }),
   setArrowStrokeWidth: (width) => set({ arrowStrokeWidth: width }),
   setArrowStyle: (style) => set({ arrowStyle: style }),

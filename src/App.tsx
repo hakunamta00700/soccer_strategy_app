@@ -9,7 +9,7 @@ import { useUIStore } from './store/uiStore';
 import PlayerInfoPanel from './components/panels/PlayerInfoPanel';
 
 function App() {
-  const { modalOpen, playerInfoLocation } = useUIStore();
+  const { modalOpen, playerInfoLocation, playerInfoVisible } = useUIStore();
 
   return (
     <div className="flex flex-col h-screen bg-gray-900">
@@ -23,11 +23,15 @@ function App() {
             <TacticalBoard />
             <BottomPanel />
           </div>
-          {playerInfoLocation === 'sidebar' && <PlayerInfoPanel variant="sidebar" />}
+          {playerInfoLocation === 'sidebar' && playerInfoVisible && (
+            <PlayerInfoPanel variant="sidebar" />
+          )}
         </div>
       </div>
       {modalOpen === 'settings' && <SettingsModal />}
-      {playerInfoLocation === 'modal' && <PlayerInfoPanel variant="modal" />}
+      {playerInfoLocation === 'modal' && playerInfoVisible && (
+        <PlayerInfoPanel variant="modal" />
+      )}
     </div>
   );
 }
