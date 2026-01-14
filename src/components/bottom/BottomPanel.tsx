@@ -189,7 +189,7 @@ function BottomPanel() {
     );
   }
 
-  return animationPanelVisible ? <AnimationPanel /> : null;
+  return null;
 }
 
 export default BottomPanel;

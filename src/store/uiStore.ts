@@ -60,7 +60,7 @@ export const useUIStore = create<UIState>((set) => ({
   playerViewMode: 'number',
   positionFilter: ['GK', 'DF', 'MF', 'FW'],
   boardOrientation: 'landscape',
-  animationPanelVisible: true,
+  animationPanelVisible: false,
   playerInfoLocation: 'sidebar',
   arrowColor: '#ffffff',
   arrowStrokeWidth: 2,
