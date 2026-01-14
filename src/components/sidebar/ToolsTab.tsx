@@ -38,6 +38,9 @@ function ToolsTab() {
     selectedObjectId,
     removeSelectedObject,
     rotateBoard,
+    clearShapes,
+    clearPlayers,
+    clearBoard,
     undo,
     redo,
     past,
@@ -340,6 +343,30 @@ function ToolsTab() {
             className="px-2 py-2 bg-red-600 text-sm text-white rounded disabled:opacity-40"
           >
             삭제
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">클리어</h3>
+        <div className="grid grid-cols-1 gap-2">
+          <button
+            onClick={clearShapes}
+            className="px-2 py-2 bg-gray-700 text-sm text-gray-200 rounded"
+          >
+            도형 모두 클리어
+          </button>
+          <button
+            onClick={clearPlayers}
+            className="px-2 py-2 bg-gray-700 text-sm text-gray-200 rounded"
+          >
+            선수 모두 클리어
+          </button>
+          <button
+            onClick={clearBoard}
+            className="px-2 py-2 bg-red-600 text-sm text-white rounded"
+          >
+            도형 + 선수 모두 클리어
           </button>
         </div>
       </div>

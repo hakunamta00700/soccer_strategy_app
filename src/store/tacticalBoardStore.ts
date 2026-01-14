@@ -157,6 +157,9 @@ interface TacticalBoardState {
   setFieldColor: (color: string) => void;
   setLineColor: (color: string) => void;
   setTeamColor: (team: 'home' | 'away', color: string) => void;
+  clearShapes: () => void;
+  clearPlayers: () => void;
+  clearBoard: () => void;
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
   setGridVisible: (visible: boolean) => void;
@@ -357,6 +360,30 @@ export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
       players: state.players.map((player) =>
         player.team === team ? { ...player, color } : player
       ),
+    })),
+  clearShapes: () =>
+    set((state) => ({
+      past: [...state.past, createSnapshot(state)],
+      future: [],
+      shapes: [],
+      selectedObjectId: null,
+    })),
+  clearPlayers: () =>
+    set((state) => ({
+      past: [...state.past, createSnapshot(state)],
+      future: [],
+      players: [],
+      selectedObjectId: null,
+      selectedPlayerIds: [],
+    })),
+  clearBoard: () =>
+    set((state) => ({
+      past: [...state.past, createSnapshot(state)],
+      future: [],
+      players: [],
+      shapes: [],
+      selectedObjectId: null,
+      selectedPlayerIds: [],
     })),
   setZoom: (zoom) => set({ zoom }),
   setPan: (pan) => set({ pan }),
