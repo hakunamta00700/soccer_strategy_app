@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useAnimationStore } from '@/store/animationStore';
 import { saveCurrentSession } from '@/services/sessionPersistence';
+import { GRID_SIZE } from '@/constants/field';
+import { snapValue } from '@/utils/grid';
 
 const isEditableTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) {
@@ -45,6 +47,40 @@ function KeyboardShortcuts() {
       if (isMeta && key === 's') {
         event.preventDefault();
         void saveCurrentSession('manual');
+        return;
+      }
+
+      if (key === 'arrowup' || key === 'arrowdown' || key === 'arrowleft' || key === 'arrowright') {
+        const boardState = useTacticalBoardStore.getState();
+        if (boardState.selectedPlayerIds.length === 0) {
+          return;
+        }
+
+        event.preventDefault();
+        const step = boardState.snapToGrid ? GRID_SIZE : 5;
+        const delta =
+          key === 'arrowup'
+            ? { x: 0, y: -step }
+            : key === 'arrowdown'
+              ? { x: 0, y: step }
+              : key === 'arrowleft'
+                ? { x: -step, y: 0 }
+                : { x: step, y: 0 };
+
+        const nextPlayers = boardState.players.map((player) => {
+          if (!boardState.selectedPlayerIds.includes(player.id)) {
+            return player;
+          }
+          const nextX = snapValue(player.x + delta.x, boardState.snapToGrid);
+          const nextY = snapValue(player.y + delta.y, boardState.snapToGrid);
+          return {
+            ...player,
+            x: nextX,
+            y: nextY,
+          };
+        });
+
+        boardState.setPlayersWithHistory(nextPlayers);
         return;
       }
 
