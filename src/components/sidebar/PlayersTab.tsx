@@ -156,7 +156,7 @@ function PlayersTab() {
   const handleAddRosterPlayer = (entry: RosterEntry, side: RosterSide) => {
     const numberValue = Number(entry.number);
     const newPlayer: Player = {
-      id: `player-${entry.playerId || Date.now()}`,
+      id: `player-${side}-${entry.playerId || Date.now()}`,
       number: Number.isFinite(numberValue) ? numberValue : 0,
       name: entry.name,
       position: normalizePosition(entry.position),

@@ -31,14 +31,12 @@ const distribute = (count: number, min: number, max: number) => {
 };
 
 const getLinePositions = (lines: number, isHome: boolean) => {
-  const start = 20;
-  const end = FIELD_WIDTH - 20;
+  const half = FIELD_WIDTH / 2;
+  const margin = 6;
+  const start = isHome ? margin : half + margin;
+  const end = isHome ? half - margin : FIELD_WIDTH - margin;
   const step = (end - start) / (lines + 1);
-  const xs = Array.from({ length: lines }, (_, index) => start + step * (index + 1));
-  if (isHome) {
-    return xs;
-  }
-  return xs.map((x) => FIELD_WIDTH - x);
+  return Array.from({ length: lines }, (_, index) => start + step * (index + 1));
 };
 
 const pickPlayers = (
@@ -92,11 +90,13 @@ function FormationTab() {
     const updated: Record<string, Player> = {};
 
     if (keeper) {
-      const keeperX = isHome ? 8 : FIELD_WIDTH - 8;
+      const half = FIELD_WIDTH / 2;
+      const keeperX = isHome ? 6 : FIELD_WIDTH - 6;
+      const clampedKeeperX = isHome ? Math.min(keeperX, half - 6) : Math.max(keeperX, half + 6);
       const keeperY = FIELD_HEIGHT / 2;
       updated[keeper.id] = {
         ...keeper,
-        x: snapValue(toPixel(keeperX), snapToGrid),
+        x: snapValue(toPixel(clampedKeeperX), snapToGrid),
         y: snapValue(toPixel(keeperY), snapToGrid),
       };
     }
