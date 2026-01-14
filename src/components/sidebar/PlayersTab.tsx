@@ -4,8 +4,9 @@ import { useRosterStore } from '@/store/rosterStore';
 import { Ball } from '@/types/ball';
 import { Player } from '@/types/player';
 import { RosterEntry, RosterSide } from '@/types/roster';
-import { FIELD_WIDTH, FIELD_HEIGHT, PIXELS_PER_METER } from '@/constants/field';
+import { CANVAS_WIDTH, FIELD_WIDTH, FIELD_HEIGHT, PIXELS_PER_METER } from '@/constants/field';
 import { snapValue } from '@/utils/grid';
+import { useUIStore } from '@/store/uiStore';
 
 function PlayersTab() {
   const [number, setNumber] = useState('');
@@ -28,6 +29,7 @@ function PlayersTab() {
     setRosterFilterHome,
     setRosterFilterAway,
   } = useRosterStore();
+  const { boardOrientation } = useUIStore();
   const [sectionsOpen, setSectionsOpen] = useState({
     rosterLoad: true,
     rosterMode: true,
@@ -89,6 +91,12 @@ function PlayersTab() {
   };
 
   const toPixel = (meters: number) => meters * PIXELS_PER_METER;
+  const mapToOrientation = (x: number, y: number) => {
+    if (boardOrientation !== 'portrait') {
+      return { x, y };
+    }
+    return { x: y, y: CANVAS_WIDTH - x };
+  };
   const distribute = (count: number, min: number, max: number) => {
     if (count <= 1) {
       return [(min + max) / 2];
@@ -205,6 +213,7 @@ function PlayersTab() {
 
   const handleAddRosterPlayer = (entry: RosterEntry, side: RosterSide) => {
     const numberValue = Number(entry.number);
+    const mappedCenter = mapToOrientation(centerX, centerY);
     const newPlayer: Player = {
       id: `player-${side}-${entry.playerId || Date.now()}`,
       number: Number.isFinite(numberValue) ? numberValue : 0,
@@ -213,8 +222,8 @@ function PlayersTab() {
       team: side,
       color: teamColors[side],
       imgUrl: entry.imgUrl || undefined,
-      x: centerX,
-      y: centerY,
+      x: mappedCenter.x,
+      y: mappedCenter.y,
     };
     addPlayer(newPlayer);
   };
@@ -293,6 +302,7 @@ function PlayersTab() {
     if (keeper) {
       const keeperX = isHome ? 6 : FIELD_WIDTH - 6;
       const keeperY = FIELD_HEIGHT / 2;
+      const mappedKeeper = mapToOrientation(toPixel(keeperX), toPixel(keeperY));
       const keeperId = keeper.playerId
         ? `player-${side}-${keeper.playerId}`
         : `player-${side}-${Date.now()}-gk`;
@@ -305,8 +315,8 @@ function PlayersTab() {
           team: side,
           color: teamColors[side],
           imgUrl: keeper.imgUrl || undefined,
-          x: snapValue(toPixel(keeperX), snapToGrid),
-          y: snapValue(toPixel(keeperY), snapToGrid),
+          x: snapValue(mappedKeeper.x, snapToGrid),
+          y: snapValue(mappedKeeper.y, snapToGrid),
         });
       }
     }
@@ -325,6 +335,7 @@ function PlayersTab() {
         if (existingIds.has(entryId)) {
           return;
         }
+        const mapped = mapToOrientation(toPixel(lineXs[lineIndex]), toPixel(ys[index]));
         newPlayers.push({
           id: entryId,
           number: Number(entry.number) || 0,
@@ -333,8 +344,8 @@ function PlayersTab() {
           team: side,
           color: teamColors[side],
           imgUrl: entry.imgUrl || undefined,
-          x: snapValue(toPixel(lineXs[lineIndex]), snapToGrid),
-          y: snapValue(toPixel(ys[index]), snapToGrid),
+          x: snapValue(mapped.x, snapToGrid),
+          y: snapValue(mapped.y, snapToGrid),
         });
       });
     });
