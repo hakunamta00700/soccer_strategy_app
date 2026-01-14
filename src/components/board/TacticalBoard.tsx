@@ -69,7 +69,11 @@ function TacticalBoard() {
       const startX = snapValue(pos.x - pan.x, snapToGrid);
       const startY = snapValue(pos.y - pan.y, snapToGrid);
       setIsDrawing(true);
-      setDrawingPoints([startX, startY]);
+      if (activeTool === 'freehand') {
+        setDrawingPoints([startX, startY]);
+      } else {
+        setDrawingPoints([startX, startY]);
+      }
       return;
     }
 
@@ -98,7 +102,17 @@ function TacticalBoard() {
       }
       const nextX = snapValue(pos.x - pan.x, snapToGrid);
       const nextY = snapValue(pos.y - pan.y, snapToGrid);
-      setDrawingPoints([drawingPoints[0], drawingPoints[1], nextX, nextY]);
+      if (activeTool === 'freehand') {
+        const lastIndex = drawingPoints.length - 2;
+        const lastX = drawingPoints[lastIndex];
+        const lastY = drawingPoints[lastIndex + 1];
+        const distance = Math.hypot(nextX - lastX, nextY - lastY);
+        if (distance > 2) {
+          setDrawingPoints([...drawingPoints, nextX, nextY]);
+        }
+      } else {
+        setDrawingPoints([drawingPoints[0], drawingPoints[1], nextX, nextY]);
+      }
       return;
     }
 
@@ -131,7 +145,16 @@ function TacticalBoard() {
       const endX = snapValue(pos.x - pan.x, snapToGrid);
       const endY = snapValue(pos.y - pan.y, snapToGrid);
 
-      if (activeTool === 'rect') {
+      if (activeTool === 'freehand') {
+        const newShape: Shape = {
+          id: `shape-${Date.now()}`,
+          type: 'freehand',
+          points: [...drawingPoints, endX, endY],
+          color: '#ffffff',
+          strokeWidth: 2,
+        };
+        addShape(newShape);
+      } else if (activeTool === 'rect') {
         const newShape: Shape = {
           id: `shape-${Date.now()}`,
           type: 'rect',

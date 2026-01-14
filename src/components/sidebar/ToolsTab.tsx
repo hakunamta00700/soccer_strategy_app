@@ -41,6 +41,7 @@ function ToolsTab() {
   const tools = [
     { id: 'arrow', label: '화살표', icon: '→' },
     { id: 'line', label: '직선', icon: '─' },
+    { id: 'freehand', label: '자유곡선', icon: '✎' },
     { id: 'rect', label: '사각형', icon: '□' },
     { id: 'circle', label: '원', icon: '○' },
     { id: 'text', label: '텍스트', icon: 'T' },

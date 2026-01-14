@@ -1,4 +1,4 @@
-export type ShapeType = 'arrow' | 'line' | 'rect' | 'circle' | 'text';
+export type ShapeType = 'arrow' | 'line' | 'rect' | 'circle' | 'text' | 'freehand';
 
 export interface Shape {
   id: string;

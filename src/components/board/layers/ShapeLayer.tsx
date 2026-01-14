@@ -60,6 +60,16 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
             dash={[5, 5]}
           />
         );
+      case 'freehand':
+        return (
+          <Line
+            points={drawingPoints}
+            stroke="#ffffff"
+            strokeWidth={2}
+            lineCap="round"
+            lineJoin="round"
+          />
+        );
       case 'arrow':
         return (
           <Arrow
@@ -129,6 +139,19 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
                 points={shape.points}
                 stroke={stroke}
                 strokeWidth={strokeWidth}
+                onClick={handleSelect}
+                onTap={handleSelect}
+              />
+            );
+          case 'freehand':
+            return (
+              <Line
+                key={shape.id}
+                points={shape.points}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                lineCap="round"
+                lineJoin="round"
                 onClick={handleSelect}
                 onTap={handleSelect}
               />

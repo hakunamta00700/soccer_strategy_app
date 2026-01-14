@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type TabType = 'players' | 'tools' | 'tactics' | 'formation';
-export type ToolType = 'arrow' | 'line' | 'rect' | 'circle' | 'text' | null;
+export type ToolType = 'arrow' | 'line' | 'rect' | 'circle' | 'text' | 'freehand' | null;
 export type ModalType = 'settings' | 'help' | 'sessionList' | null;
 export type StrokeStyle = 'solid' | 'dashed';
 export type PlayerViewMode = 'number' | 'photo';
