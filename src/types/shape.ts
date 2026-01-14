@@ -10,6 +10,8 @@ export interface Shape {
   pointerLength?: number;
   pointerWidth?: number;
   hasArrow?: boolean;
+  text?: string;
+  fontSize?: number;
   fill?: string;
   opacity?: number;
 }

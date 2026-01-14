@@ -162,6 +162,20 @@ function TacticalBoard() {
           hasArrow: freehandHasArrow,
         };
         addShape(newShape);
+      } else if (activeTool === 'text') {
+        const textValue = window.prompt('텍스트를 입력하세요', '텍스트');
+        if (textValue) {
+          const newShape: Shape = {
+            id: `shape-${Date.now()}`,
+            type: 'text',
+            points: [endX, endY],
+            color: '#ffffff',
+            strokeWidth: 1,
+            text: textValue,
+            fontSize: 16,
+          };
+          addShape(newShape);
+        }
       } else if (activeTool === 'rect') {
         const newShape: Shape = {
           id: `shape-${Date.now()}`,

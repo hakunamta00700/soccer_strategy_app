@@ -1,4 +1,4 @@
-import { Layer, Rect, Circle, Line, Arrow, Group } from 'react-konva';
+import { Layer, Rect, Circle, Line, Arrow, Group, Text } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 
@@ -100,6 +100,17 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
             pointerLength={arrowPointerLength}
             pointerWidth={arrowPointerWidth}
             dash={arrowStyle === 'dashed' ? [8, 6] : undefined}
+          />
+        );
+      case 'text':
+        return (
+          <Text
+            x={drawingPoints[0]}
+            y={drawingPoints[1]}
+            text="텍스트"
+            fontSize={16}
+            fill="#ffffff"
+            opacity={0.6}
           />
         );
       default:
@@ -206,6 +217,19 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
                 dash={shape.dash}
                 pointerLength={shape.pointerLength ?? 10}
                 pointerWidth={shape.pointerWidth ?? 10}
+                onClick={handleSelect}
+                onTap={handleSelect}
+              />
+            );
+          case 'text':
+            return (
+              <Text
+                key={shape.id}
+                x={shape.points[0]}
+                y={shape.points[1]}
+                text={shape.text ?? '텍스트'}
+                fontSize={shape.fontSize ?? 16}
+                fill={stroke}
                 onClick={handleSelect}
                 onTap={handleSelect}
               />
