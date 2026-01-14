@@ -21,15 +21,21 @@ function PlayerLayer({ transform }: PlayerLayerProps) {
     setSelectedPlayers,
     toggleSelectedPlayer,
   } = useTacticalBoardStore();
-  const { playerViewMode, positionFilter } = useUIStore();
+  const { playerViewMode, positionFilter, activeTool } = useUIStore();
   const dragSelectionRef = useRef<{
     ids: string[];
     startPositions: Map<string, { x: number; y: number }>;
     anchorId: string;
   } | null>(null);
   const dragRaf = useRef<number | null>(null);
+  const isShapeSelected =
+    selectedObjectId !== null &&
+    !players.some((player) => player.id === selectedObjectId);
 
   const handleSelect = (playerId: string, event: any) => {
+    if (activeTool || isShapeSelected) {
+      return;
+    }
     const isMulti = event?.evt?.shiftKey;
     if (isMulti) {
       toggleSelectedPlayer(playerId);
