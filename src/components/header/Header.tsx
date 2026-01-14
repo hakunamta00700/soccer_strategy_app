@@ -1,5 +1,6 @@
 import { useUIStore } from '@/store/uiStore';
 import { useSessionStore } from '@/store/sessionStore';
+import { saveCurrentSession } from '@/services/sessionPersistence';
 
 function Header() {
   const { saveStatus, setModalOpen } = useUIStore();
@@ -46,6 +47,12 @@ function Header() {
 
       <div className="flex items-center gap-4">
         <div className={`text-sm ${getSaveStatusColor()}`}>{getSaveStatusText()}</div>
+        <button
+          onClick={() => void saveCurrentSession('manual')}
+          className="px-3 py-1 text-xs bg-gray-700 text-white rounded hover:bg-gray-600"
+        >
+          저장
+        </button>
         <button
           onClick={() => setModalOpen('settings')}
           className="p-2 hover:bg-gray-700 rounded transition-colors"

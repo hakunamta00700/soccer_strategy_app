@@ -26,7 +26,7 @@ const createSession = (name: string, description?: string): Session => ({
 });
 
 function SessionListModal() {
-  const { setModalOpen, setSaveStatus } = useUIStore();
+  const { setModalOpen, setSaveStatus, saveStatus } = useUIStore();
   const {
     sessions,
     currentSessionId,
@@ -71,9 +71,27 @@ function SessionListModal() {
     clearSelection();
   };
 
+  const confirmSessionSwitch = (nextSessionId: string | null) => {
+    if (saveStatus !== 'unsaved') {
+      return true;
+    }
+    if (!currentSessionId) {
+      return true;
+    }
+    if (nextSessionId && nextSessionId === currentSessionId) {
+      return true;
+    }
+    return window.confirm(
+      '저장되지 않은 변경사항이 있습니다. 변경사항을 버리고 전환하시겠습니까?'
+    );
+  };
+
   const handleCreateSession = async () => {
     if (!name.trim()) {
       alert('세션 이름을 입력해주세요.');
+      return;
+    }
+    if (!confirmSessionSwitch(null)) {
       return;
     }
 
@@ -90,6 +108,9 @@ function SessionListModal() {
   };
 
   const handleLoadSession = (session: Session) => {
+    if (!confirmSessionSwitch(session.id)) {
+      return;
+    }
     setCurrentSession(session.id);
     const tactic = session.tactics[0] ?? null;
     setCurrentTactic(tactic?.id ?? null);
