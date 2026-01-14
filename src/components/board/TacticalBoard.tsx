@@ -30,6 +30,9 @@ function TacticalBoard() {
     arrowPointerLength,
     arrowPointerWidth,
     boardOrientation,
+    freehandColor,
+    freehandStrokeWidth,
+    freehandOpacity,
   } = useUIStore();
   const homeCount = players.filter((player) => player.team === 'home').length;
   const awayCount = players.filter((player) => player.team === 'away').length;
@@ -150,8 +153,9 @@ function TacticalBoard() {
           id: `shape-${Date.now()}`,
           type: 'freehand',
           points: [...drawingPoints, endX, endY],
-          color: '#ffffff',
-          strokeWidth: 2,
+          color: freehandColor,
+          strokeWidth: freehandStrokeWidth,
+          opacity: freehandOpacity,
         };
         addShape(newShape);
       } else if (activeTool === 'rect') {

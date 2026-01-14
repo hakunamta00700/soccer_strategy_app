@@ -17,6 +17,9 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
     arrowStyle,
     arrowPointerLength,
     arrowPointerWidth,
+    freehandColor,
+    freehandStrokeWidth,
+    freehandOpacity,
   } = useUIStore();
 
   const renderDrawingShape = () => {
@@ -64,10 +67,11 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
         return (
           <Line
             points={drawingPoints}
-            stroke="#ffffff"
-            strokeWidth={2}
+            stroke={freehandColor}
+            strokeWidth={freehandStrokeWidth}
             lineCap="round"
             lineJoin="round"
+            opacity={freehandOpacity}
           />
         );
       case 'arrow':
@@ -152,6 +156,7 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
                 strokeWidth={strokeWidth}
                 lineCap="round"
                 lineJoin="round"
+                opacity={shape.opacity}
                 onClick={handleSelect}
                 onTap={handleSelect}
               />

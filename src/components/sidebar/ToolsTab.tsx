@@ -21,6 +21,12 @@ function ToolsTab() {
     setArrowStyle,
     setArrowPointerLength,
     setArrowPointerWidth,
+    freehandColor,
+    freehandStrokeWidth,
+    freehandOpacity,
+    setFreehandColor,
+    setFreehandStrokeWidth,
+    setFreehandOpacity,
   } = useUIStore();
   const {
     gridVisible,
@@ -263,6 +269,50 @@ function ToolsTab() {
                 />
               </label>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTool === 'freehand' && (
+        <div>
+          <h3 className="text-sm font-medium text-gray-300 mb-2">자유곡선 스타일</h3>
+          <div className="bg-gray-700 p-3 rounded space-y-3">
+            <label className="block text-xs text-gray-400">
+              색상
+              <input
+                type="color"
+                value={freehandColor}
+                onChange={(e) => setFreehandColor(e.target.value)}
+                className="mt-1 w-full h-8 bg-gray-600 rounded"
+              />
+            </label>
+            <label className="block text-xs text-gray-400">
+              두께
+              <input
+                type="number"
+                min={1}
+                max={12}
+                value={freehandStrokeWidth}
+                onChange={(e) =>
+                  setFreehandStrokeWidth(Math.max(1, Number(e.target.value)))
+                }
+                className="mt-1 w-full px-2 py-1 bg-gray-600 text-white rounded text-sm"
+              />
+            </label>
+            <label className="block text-xs text-gray-400">
+              투명도
+              <input
+                type="number"
+                min={0.1}
+                max={1}
+                step={0.1}
+                value={freehandOpacity}
+                onChange={(e) =>
+                  setFreehandOpacity(Math.min(1, Math.max(0.1, Number(e.target.value))))
+                }
+                className="mt-1 w-full px-2 py-1 bg-gray-600 text-white rounded text-sm"
+              />
+            </label>
           </div>
         </div>
       )}
