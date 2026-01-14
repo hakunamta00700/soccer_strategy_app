@@ -57,7 +57,8 @@ function KeyboardShortcuts() {
         }
 
         event.preventDefault();
-        const step = boardState.snapToGrid ? GRID_SIZE : 5;
+        const baseStep = boardState.snapToGrid ? GRID_SIZE : 5;
+        const step = event.shiftKey ? baseStep * 3 : baseStep;
         const delta =
           key === 'arrowup'
             ? { x: 0, y: -step }
