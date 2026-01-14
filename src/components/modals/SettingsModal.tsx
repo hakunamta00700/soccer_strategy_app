@@ -10,6 +10,8 @@ function SettingsModal() {
     setPlayerInfoLocation,
     playerInfoVisible,
     setPlayerInfoVisible,
+    animationPanelEnabled,
+    setAnimationPanelEnabled,
   } = useUIStore();
   const {
     fieldColor,
@@ -130,6 +132,19 @@ function SettingsModal() {
                 className="rounded"
               />
               선수 정보 패널 표시
+            </label>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-xs font-medium text-gray-400">애니메이션 패널</h3>
+            <label className="flex items-center gap-2 text-xs text-gray-300">
+              <input
+                type="checkbox"
+                checked={animationPanelEnabled}
+                onChange={(e) => setAnimationPanelEnabled(e.target.checked)}
+                className="rounded"
+              />
+              애니메이션 패널 표시
             </label>
           </div>
         </div>

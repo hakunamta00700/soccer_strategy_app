@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAnimationStore } from '@/store/animationStore';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
+import { useUIStore } from '@/store/uiStore';
 import { Animation, Keyframe } from '@/types/animation';
 import { Player } from '@/types/player';
 import { Shape } from '@/types/shape';
@@ -106,6 +107,7 @@ const getInterpolatedFrame = (animation: Animation, time: number) => {
 };
 
 function AnimationPanel() {
+  const { animationPanelCollapsed, setAnimationPanelCollapsed } = useUIStore();
   const {
     animations,
     addAnimation,
@@ -315,6 +317,20 @@ function AnimationPanel() {
     setIsResizing(true);
   };
 
+  if (animationPanelCollapsed) {
+    return (
+      <div className="h-10 bg-gray-800 border-t border-gray-700 flex items-center justify-between px-4">
+        <div className="text-sm text-gray-200">애니메이션</div>
+        <button
+          onClick={() => setAnimationPanelCollapsed(false)}
+          className="text-xs text-gray-300 bg-gray-700 px-2 py-1 rounded"
+        >
+          펼치기
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div
       className="bg-gray-800 border-t border-gray-700 relative overflow-y-auto"
@@ -328,14 +344,22 @@ function AnimationPanel() {
       <div className="h-full px-4 pb-4 pt-4 space-y-3">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-white">애니메이션</h3>
-          {!activeAnimation && (
+          <div className="flex items-center gap-2">
+            {!activeAnimation && (
+              <button
+                onClick={handleCreateAnimation}
+                className="px-2 py-1 bg-gray-700 text-xs text-white rounded"
+              >
+                애니메이션 생성
+              </button>
+            )}
             <button
-              onClick={handleCreateAnimation}
+              onClick={() => setAnimationPanelCollapsed(true)}
               className="px-2 py-1 bg-gray-700 text-xs text-white rounded"
             >
-              애니메이션 생성
+              접기
             </button>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-5 gap-2">

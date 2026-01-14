@@ -3,7 +3,7 @@ import AnimationPanel from './AnimationPanel';
 import { useUIStore } from '@/store/uiStore';
 
 function BottomPanel() {
-  const { animationPanelVisible } = useUIStore();
+  const { animationPanelEnabled } = useUIStore();
   const {
     selectedObjectId,
     players,
@@ -17,7 +17,7 @@ function BottomPanel() {
   const selectedShape = shapes.find((shape) => shape.id === selectedObjectId);
 
   if (!selectedObjectId || (!selectedPlayer && !selectedBall && !selectedShape)) {
-    return animationPanelVisible ? <AnimationPanel /> : null;
+    return animationPanelEnabled ? <AnimationPanel /> : null;
   }
 
   if (selectedShape && selectedShape.type === 'arrow') {

@@ -17,7 +17,8 @@ interface UIState {
   playerViewMode: PlayerViewMode;
   positionFilter: Array<'GK' | 'DF' | 'MF' | 'FW'>;
   boardOrientation: BoardOrientation;
-  animationPanelVisible: boolean;
+  animationPanelEnabled: boolean;
+  animationPanelCollapsed: boolean;
   playerInfoLocation: PlayerInfoLocation;
   playerInfoVisible: boolean;
   arrowColor: string;
@@ -39,7 +40,8 @@ interface UIState {
   setPlayerViewMode: (mode: PlayerViewMode) => void;
   setPositionFilter: (positions: Array<'GK' | 'DF' | 'MF' | 'FW'>) => void;
   setBoardOrientation: (orientation: BoardOrientation) => void;
-  setAnimationPanelVisible: (visible: boolean) => void;
+  setAnimationPanelEnabled: (enabled: boolean) => void;
+  setAnimationPanelCollapsed: (collapsed: boolean) => void;
   setPlayerInfoLocation: (location: PlayerInfoLocation) => void;
   setPlayerInfoVisible: (visible: boolean) => void;
   setArrowColor: (color: string) => void;
@@ -62,7 +64,8 @@ export const useUIStore = create<UIState>((set) => ({
   playerViewMode: 'number',
   positionFilter: ['GK', 'DF', 'MF', 'FW'],
   boardOrientation: 'landscape',
-  animationPanelVisible: false,
+  animationPanelEnabled: false,
+  animationPanelCollapsed: false,
   playerInfoLocation: 'sidebar',
   playerInfoVisible: true,
   arrowColor: '#ffffff',
@@ -83,7 +86,8 @@ export const useUIStore = create<UIState>((set) => ({
   setPlayerViewMode: (mode) => set({ playerViewMode: mode }),
   setPositionFilter: (positions) => set({ positionFilter: positions }),
   setBoardOrientation: (orientation) => set({ boardOrientation: orientation }),
-  setAnimationPanelVisible: (visible) => set({ animationPanelVisible: visible }),
+  setAnimationPanelEnabled: (enabled) => set({ animationPanelEnabled: enabled }),
+  setAnimationPanelCollapsed: (collapsed) => set({ animationPanelCollapsed: collapsed }),
   setPlayerInfoLocation: (location) => set({ playerInfoLocation: location }),
   setPlayerInfoVisible: (visible) => set({ playerInfoVisible: visible }),
   setArrowColor: (color) => set({ arrowColor: color }),

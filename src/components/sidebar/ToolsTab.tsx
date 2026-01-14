@@ -11,8 +11,8 @@ function ToolsTab() {
     setPositionFilter,
     boardOrientation,
     setBoardOrientation,
-    animationPanelVisible,
-    setAnimationPanelVisible,
+    animationPanelEnabled,
+    setAnimationPanelEnabled,
     arrowColor,
     arrowStrokeWidth,
     arrowStyle,
@@ -132,8 +132,8 @@ function ToolsTab() {
           <label className="flex items-center gap-2 text-sm text-gray-300">
             <input
               type="checkbox"
-              checked={animationPanelVisible}
-              onChange={(e) => setAnimationPanelVisible(e.target.checked)}
+              checked={animationPanelEnabled}
+              onChange={(e) => setAnimationPanelEnabled(e.target.checked)}
               className="rounded"
             />
             애니메이션 패널
