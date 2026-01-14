@@ -156,6 +156,8 @@ function TacticalBoard() {
           color: freehandColor,
           strokeWidth: freehandStrokeWidth,
           opacity: freehandOpacity,
+          pointerLength: arrowPointerLength,
+          pointerWidth: arrowPointerWidth,
         };
         addShape(newShape);
       } else if (activeTool === 'rect') {

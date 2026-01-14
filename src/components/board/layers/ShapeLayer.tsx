@@ -65,12 +65,14 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
         );
       case 'freehand':
         return (
-          <Line
+          <Arrow
             points={drawingPoints}
             stroke={freehandColor}
+            fill={freehandColor}
             strokeWidth={freehandStrokeWidth}
-            lineCap="round"
-            lineJoin="round"
+            pointerLength={arrowPointerLength}
+            pointerWidth={arrowPointerWidth}
+            tension={0.5}
             opacity={freehandOpacity}
           />
         );
@@ -149,13 +151,15 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
             );
           case 'freehand':
             return (
-              <Line
+              <Arrow
                 key={shape.id}
                 points={shape.points}
                 stroke={stroke}
                 strokeWidth={strokeWidth}
-                lineCap="round"
-                lineJoin="round"
+                fill={shape.color}
+                pointerLength={shape.pointerLength ?? arrowPointerLength}
+                pointerWidth={shape.pointerWidth ?? arrowPointerWidth}
+                tension={0.5}
                 opacity={shape.opacity}
                 onClick={handleSelect}
                 onTap={handleSelect}
