@@ -42,6 +42,7 @@ const toSession = (persisted: PersistedSession): Session => ({
   tactics: persisted.tactics.map((tactic) => ({
     ...tactic,
     createdAt: new Date(tactic.createdAt),
+    balls: tactic.balls ?? [],
   })),
 });
 

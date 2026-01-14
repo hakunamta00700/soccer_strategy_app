@@ -10,6 +10,7 @@ const createEmptyTactic = (): Tactic => ({
   id: `tactic-${Date.now()}`,
   name: '기본 전술',
   players: [],
+  balls: [],
   shapes: [],
   animations: [],
   createdAt: new Date(),
@@ -25,7 +26,7 @@ const createSession = (name: string, description?: string): Session => ({
 });
 
 function SessionListModal() {
-  const { setModalOpen } = useUIStore();
+  const { setModalOpen, setSaveStatus } = useUIStore();
   const {
     sessions,
     currentSessionId,
@@ -35,7 +36,7 @@ function SessionListModal() {
     setCurrentSession,
     setCurrentTactic,
   } = useSessionStore();
-  const { setPlayers, setShapes, clearSelection } = useTacticalBoardStore();
+  const { setPlayers, setShapes, setBalls, clearSelection } = useTacticalBoardStore();
   const { setAnimations, setIsPlaying, setCurrentTime } = useAnimationStore();
 
   const [name, setName] = useState('');
@@ -52,6 +53,7 @@ function SessionListModal() {
   const applyTactic = (tactic: Tactic | null) => {
     if (!tactic) {
       setPlayers([]);
+      setBalls([]);
       setShapes([]);
       setAnimations([]);
       setIsPlaying(false);
@@ -61,6 +63,7 @@ function SessionListModal() {
     }
 
     setPlayers(tactic.players);
+    setBalls(tactic.balls ?? []);
     setShapes(tactic.shapes);
     setAnimations(tactic.animations);
     setIsPlaying(false);
@@ -80,6 +83,7 @@ function SessionListModal() {
     setCurrentTactic(session.tactics[0]?.id ?? null);
     applyTactic(session.tactics[0] ?? null);
     await storageService.saveSession(session);
+    setSaveStatus('saved');
     setName('');
     setDescription('');
     setModalOpen(null);
@@ -90,6 +94,7 @@ function SessionListModal() {
     const tactic = session.tactics[0] ?? null;
     setCurrentTactic(tactic?.id ?? null);
     applyTactic(tactic);
+    setSaveStatus('saved');
     setModalOpen(null);
   };
 
@@ -107,6 +112,7 @@ function SessionListModal() {
       setCurrentSession(next?.id ?? null);
       setCurrentTactic(next?.tactics[0]?.id ?? null);
       applyTactic(next?.tactics[0] ?? null);
+      setSaveStatus('saved');
     }
   };
 

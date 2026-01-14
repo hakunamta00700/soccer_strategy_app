@@ -12,11 +12,12 @@ import { storageService } from './services/storageService';
 import { useSessionStore } from './store/sessionStore';
 import { useTacticalBoardStore } from './store/tacticalBoardStore';
 import { useAnimationStore } from './store/animationStore';
+import SessionPersistence from './components/SessionPersistence';
 
 function App() {
-  const { modalOpen, playerInfoLocation, playerInfoVisible } = useUIStore();
+  const { modalOpen, playerInfoLocation, playerInfoVisible, setSaveStatus } = useUIStore();
   const { setSessions, setCurrentSession, setCurrentTactic } = useSessionStore();
-  const { setPlayers, setShapes, clearSelection } = useTacticalBoardStore();
+  const { setPlayers, setShapes, setBalls, clearSelection } = useTacticalBoardStore();
   const { setAnimations, setIsPlaying, setCurrentTime } = useAnimationStore();
 
   useEffect(() => {
@@ -36,18 +37,33 @@ function App() {
       setCurrentSession(active.id);
       setCurrentTactic(tactic?.id ?? null);
       setPlayers(tactic?.players ?? []);
+      setBalls(tactic?.balls ?? []);
       setShapes(tactic?.shapes ?? []);
       setAnimations(tactic?.animations ?? []);
       setIsPlaying(false);
       setCurrentTime(0);
       clearSelection();
+      setSaveStatus('saved');
     };
 
     loadSessions();
-  }, [setSessions, setCurrentSession, setCurrentTactic, setPlayers, setShapes, setAnimations, setIsPlaying, setCurrentTime, clearSelection]);
+  }, [
+    setSessions,
+    setCurrentSession,
+    setCurrentTactic,
+    setPlayers,
+    setBalls,
+    setShapes,
+    setAnimations,
+    setIsPlaying,
+    setCurrentTime,
+    clearSelection,
+    setSaveStatus,
+  ]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-900">
+      <SessionPersistence />
       <KeyboardShortcuts />
       <Header />
       <div className="flex flex-1 overflow-hidden">

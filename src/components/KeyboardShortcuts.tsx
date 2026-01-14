@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useAnimationStore } from '@/store/animationStore';
+import { saveCurrentSession } from '@/services/sessionPersistence';
 
 const isEditableTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) {
@@ -38,6 +39,12 @@ function KeyboardShortcuts() {
       if (isMeta && key === 'y') {
         event.preventDefault();
         useTacticalBoardStore.getState().redo();
+        return;
+      }
+
+      if (isMeta && key === 's') {
+        event.preventDefault();
+        void saveCurrentSession('manual');
         return;
       }
 
