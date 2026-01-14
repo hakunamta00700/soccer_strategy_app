@@ -48,6 +48,17 @@ function KeyboardShortcuts() {
         return;
       }
 
+      if (isMeta && key === 'a') {
+        event.preventDefault();
+        const boardState = useTacticalBoardStore.getState();
+        if (boardState.players.length === 0) {
+          return;
+        }
+        const ids = boardState.players.map((player) => player.id);
+        boardState.setSelectedPlayers(ids);
+        return;
+      }
+
       if (isMeta && key === 's') {
         event.preventDefault();
         void saveCurrentSession('manual');

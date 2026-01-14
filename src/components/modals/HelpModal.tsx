@@ -30,6 +30,10 @@ function HelpModal() {
             <span className="text-gray-400">Ctrl/Cmd + Y</span>
           </div>
           <div className="flex justify-between">
+            <span>전체 선택</span>
+            <span className="text-gray-400">Ctrl/Cmd + A</span>
+          </div>
+          <div className="flex justify-between">
             <span>재생/일시정지</span>
             <span className="text-gray-400">Space</span>
           </div>
