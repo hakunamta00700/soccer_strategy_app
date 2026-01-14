@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useAnimationStore } from '@/store/animationStore';
 import { saveCurrentSession } from '@/services/sessionPersistence';
-import { GRID_SIZE } from '@/constants/field';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, GRID_SIZE } from '@/constants/field';
 import { snapValue } from '@/utils/grid';
 
 const isEditableTarget = (target: EventTarget | null) => {
@@ -20,6 +20,10 @@ const isEditableTarget = (target: EventTarget | null) => {
 
 function KeyboardShortcuts() {
   useEffect(() => {
+    const clampValue = (value: number, min: number, max: number) =>
+      Math.min(Math.max(value, min), max);
+    const playerRadius = 22;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isEditableTarget(event.target)) {
         return;
@@ -72,8 +76,10 @@ function KeyboardShortcuts() {
           if (!boardState.selectedPlayerIds.includes(player.id)) {
             return player;
           }
-          const nextX = snapValue(player.x + delta.x, boardState.snapToGrid);
-          const nextY = snapValue(player.y + delta.y, boardState.snapToGrid);
+          const snappedX = snapValue(player.x + delta.x, boardState.snapToGrid);
+          const snappedY = snapValue(player.y + delta.y, boardState.snapToGrid);
+          const nextX = clampValue(snappedX, playerRadius, CANVAS_WIDTH - playerRadius);
+          const nextY = clampValue(snappedY, playerRadius, CANVAS_HEIGHT - playerRadius);
           return {
             ...player,
             x: nextX,
