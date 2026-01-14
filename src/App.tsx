@@ -4,8 +4,12 @@ import TacticalBoard from './components/board/TacticalBoard';
 import BottomPanel from './components/bottom/BottomPanel';
 import DevSeedAnimation from './components/DevSeedAnimation';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
+import SettingsModal from './components/modals/SettingsModal';
+import { useUIStore } from './store/uiStore';
 
 function App() {
+  const { modalOpen } = useUIStore();
+
   return (
     <div className="flex flex-col h-screen bg-gray-900">
       <DevSeedAnimation />
@@ -18,6 +22,7 @@ function App() {
           <BottomPanel />
         </div>
       </div>
+      {modalOpen === 'settings' && <SettingsModal />}
     </div>
   );
 }

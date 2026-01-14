@@ -49,11 +49,13 @@ function PlayersTab() {
     updateBall,
     setPlayersWithHistory,
     snapToGrid,
+    homeColor,
+    awayColor,
   } = useTacticalBoardStore();
 
   const teamColors = {
-    home: '#e63946',
-    away: '#457b9d',
+    home: homeColor,
+    away: awayColor,
   };
 
   const handleAddPlayer = () => {

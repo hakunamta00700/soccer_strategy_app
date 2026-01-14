@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { Player } from '@/types/player';
 import { Ball } from '@/types/ball';
 import { Shape } from '@/types/shape';
-import { CANVAS_WIDTH } from '@/constants/field';
+import { CANVAS_WIDTH, FIELD_COLOR, LINE_COLOR } from '@/constants/field';
 import { useAnimationStore } from '@/store/animationStore';
 
 type Snapshot = {
@@ -119,6 +119,10 @@ interface TacticalBoardState {
   shapes: Shape[];
   selectedObjectId: string | null;
   selectedPlayerIds: string[];
+  fieldColor: string;
+  lineColor: string;
+  homeColor: string;
+  awayColor: string;
   zoom: number;
   pan: { x: number; y: number };
   gridVisible: boolean;
@@ -150,6 +154,9 @@ interface TacticalBoardState {
   clearSelection: () => void;
   clearPlayerSelection: () => void;
   rotateBoard: (clockwise: boolean) => void;
+  setFieldColor: (color: string) => void;
+  setLineColor: (color: string) => void;
+  setTeamColor: (team: 'home' | 'away', color: string) => void;
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
   setGridVisible: (visible: boolean) => void;
@@ -163,6 +170,10 @@ export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
   shapes: [],
   selectedObjectId: null,
   selectedPlayerIds: [],
+  fieldColor: FIELD_COLOR,
+  lineColor: LINE_COLOR,
+  homeColor: '#e63946',
+  awayColor: '#457b9d',
   zoom: 1,
   pan: { x: 0, y: 0 },
   gridVisible: false,
@@ -338,6 +349,15 @@ export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
         pan: { x: 0, y: 0 },
       };
     }),
+  setFieldColor: (color) => set({ fieldColor: color }),
+  setLineColor: (color) => set({ lineColor: color }),
+  setTeamColor: (team, color) =>
+    set((state) => ({
+      ...(team === 'home' ? { homeColor: color } : { awayColor: color }),
+      players: state.players.map((player) =>
+        player.team === team ? { ...player, color } : player
+      ),
+    })),
   setZoom: (zoom) => set({ zoom }),
   setPan: (pan) => set({ pan }),
   setGridVisible: (visible) => set({ gridVisible: visible }),

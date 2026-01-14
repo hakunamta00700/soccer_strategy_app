@@ -2,10 +2,8 @@ import { Layer, Rect, Line, Circle } from 'react-konva';
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
-  LINE_COLOR,
   LINE_WIDTH,
   LINES,
-  FIELD_COLOR,
   PIXELS_PER_METER,
   GRID_SIZE,
   GRID_COLOR,
@@ -47,7 +45,7 @@ const mapRect = (x: number, y: number, width: number, height: number, isPortrait
 };
 
 function BackgroundLayer() {
-  const { gridVisible } = useTacticalBoardStore();
+  const { gridVisible, fieldColor, lineColor } = useTacticalBoardStore();
   const { boardOrientation } = useUIStore();
   const isPortrait = boardOrientation === 'portrait';
   const toPixel = (meters: number) => meters * PIXELS_PER_METER;
@@ -135,7 +133,7 @@ function BackgroundLayer() {
         y={backgroundRect.y}
         width={backgroundRect.width}
         height={backgroundRect.height}
-        fill={FIELD_COLOR}
+        fill={fieldColor}
       />
 
       {verticalLines}
@@ -143,7 +141,7 @@ function BackgroundLayer() {
 
       <Line
         points={centerLine}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
@@ -151,7 +149,7 @@ function BackgroundLayer() {
         x={centerCircle.x}
         y={centerCircle.y}
         radius={toPixel(LINES.centerCircleRadius)}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
@@ -159,7 +157,7 @@ function BackgroundLayer() {
         x={centerSpot.x}
         y={centerSpot.y}
         radius={3}
-        fill={LINE_COLOR}
+        fill={lineColor}
       />
 
       <Rect
@@ -167,7 +165,7 @@ function BackgroundLayer() {
         y={penaltyBoxLeft.y}
         width={penaltyBoxLeft.width}
         height={penaltyBoxLeft.height}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
@@ -176,7 +174,7 @@ function BackgroundLayer() {
         y={penaltyBoxRight.y}
         width={penaltyBoxRight.width}
         height={penaltyBoxRight.height}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
@@ -185,7 +183,7 @@ function BackgroundLayer() {
         y={goalAreaLeft.y}
         width={goalAreaLeft.width}
         height={goalAreaLeft.height}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
@@ -194,7 +192,7 @@ function BackgroundLayer() {
         y={goalAreaRight.y}
         width={goalAreaRight.width}
         height={goalAreaRight.height}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
@@ -202,37 +200,37 @@ function BackgroundLayer() {
         x={penaltySpotLeft.x}
         y={penaltySpotLeft.y}
         radius={3}
-        fill={LINE_COLOR}
+        fill={lineColor}
       />
 
       <Circle
         x={penaltySpotRight.x}
         y={penaltySpotRight.y}
         radius={3}
-        fill={LINE_COLOR}
+        fill={lineColor}
       />
 
       <Line
         points={sidelineLeft}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
       <Line
         points={sidelineRight}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
       <Line
         points={goalLineTop}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
 
       <Line
         points={goalLineBottom}
-        stroke={LINE_COLOR}
+        stroke={lineColor}
         strokeWidth={LINE_WIDTH}
       />
       {[
@@ -249,7 +247,7 @@ function BackgroundLayer() {
             x={mapped.x}
             y={mapped.y}
             radius={toPixel(LINES.cornerArcRadius)}
-            stroke={LINE_COLOR}
+            stroke={lineColor}
             strokeWidth={LINE_WIDTH}
             angle={angle}
           />
