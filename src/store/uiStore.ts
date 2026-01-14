@@ -24,6 +24,7 @@ interface UIState {
   freehandColor: string;
   freehandStrokeWidth: number;
   freehandOpacity: number;
+  freehandHasArrow: boolean;
 
   // Actions
   setSidebarOpen: (open: boolean) => void;
@@ -42,6 +43,7 @@ interface UIState {
   setFreehandColor: (color: string) => void;
   setFreehandStrokeWidth: (width: number) => void;
   setFreehandOpacity: (opacity: number) => void;
+  setFreehandHasArrow: (enabled: boolean) => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -61,6 +63,7 @@ export const useUIStore = create<UIState>((set) => ({
   freehandColor: '#ffffff',
   freehandStrokeWidth: 2,
   freehandOpacity: 1,
+  freehandHasArrow: true,
 
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   setActiveTab: (tab) => set({ activeTab: tab }),
@@ -78,4 +81,5 @@ export const useUIStore = create<UIState>((set) => ({
   setFreehandColor: (color) => set({ freehandColor: color }),
   setFreehandStrokeWidth: (width) => set({ freehandStrokeWidth: width }),
   setFreehandOpacity: (opacity) => set({ freehandOpacity: opacity }),
+  setFreehandHasArrow: (enabled) => set({ freehandHasArrow: enabled }),
 }));

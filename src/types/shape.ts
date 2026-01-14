@@ -9,6 +9,7 @@ export interface Shape {
   dash?: number[];
   pointerLength?: number;
   pointerWidth?: number;
+  hasArrow?: boolean;
   fill?: string;
   opacity?: number;
 }

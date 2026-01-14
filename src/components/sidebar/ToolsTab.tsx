@@ -27,6 +27,8 @@ function ToolsTab() {
     setFreehandColor,
     setFreehandStrokeWidth,
     setFreehandOpacity,
+    freehandHasArrow,
+    setFreehandHasArrow,
   } = useUIStore();
   const {
     gridVisible,
@@ -315,6 +317,15 @@ function ToolsTab() {
                 }
                 className="mt-1 w-full px-2 py-1 bg-gray-600 text-white rounded text-sm"
               />
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-300">
+              <input
+                type="checkbox"
+                checked={freehandHasArrow}
+                onChange={(e) => setFreehandHasArrow(e.target.checked)}
+                className="rounded"
+              />
+              화살표 표시
             </label>
           </div>
         </div>

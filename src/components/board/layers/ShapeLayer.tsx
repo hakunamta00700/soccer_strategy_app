@@ -20,6 +20,7 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
     freehandColor,
     freehandStrokeWidth,
     freehandOpacity,
+    freehandHasArrow,
   } = useUIStore();
 
   const renderDrawingShape = () => {
@@ -64,14 +65,27 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
           />
         );
       case 'freehand':
+        if (freehandHasArrow) {
+          return (
+            <Arrow
+              points={drawingPoints}
+              stroke={freehandColor}
+              fill={freehandColor}
+              strokeWidth={freehandStrokeWidth}
+              pointerLength={arrowPointerLength}
+              pointerWidth={arrowPointerWidth}
+              tension={0.5}
+              opacity={freehandOpacity}
+            />
+          );
+        }
         return (
-          <Arrow
+          <Line
             points={drawingPoints}
             stroke={freehandColor}
-            fill={freehandColor}
             strokeWidth={freehandStrokeWidth}
-            pointerLength={arrowPointerLength}
-            pointerWidth={arrowPointerWidth}
+            lineCap="round"
+            lineJoin="round"
             tension={0.5}
             opacity={freehandOpacity}
           />
@@ -150,15 +164,31 @@ function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
               />
             );
           case 'freehand':
+            if (shape.hasArrow) {
+              return (
+                <Arrow
+                  key={shape.id}
+                  points={shape.points}
+                  stroke={stroke}
+                  strokeWidth={strokeWidth}
+                  fill={shape.color}
+                  pointerLength={shape.pointerLength ?? arrowPointerLength}
+                  pointerWidth={shape.pointerWidth ?? arrowPointerWidth}
+                  tension={0.5}
+                  opacity={shape.opacity}
+                  onClick={handleSelect}
+                  onTap={handleSelect}
+                />
+              );
+            }
             return (
-              <Arrow
+              <Line
                 key={shape.id}
                 points={shape.points}
                 stroke={stroke}
                 strokeWidth={strokeWidth}
-                fill={shape.color}
-                pointerLength={shape.pointerLength ?? arrowPointerLength}
-                pointerWidth={shape.pointerWidth ?? arrowPointerWidth}
+                lineCap="round"
+                lineJoin="round"
                 tension={0.5}
                 opacity={shape.opacity}
                 onClick={handleSelect}
