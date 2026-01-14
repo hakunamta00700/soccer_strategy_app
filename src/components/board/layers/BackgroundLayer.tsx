@@ -127,7 +127,7 @@ function BackgroundLayer() {
   const goalLineBottom = mapLine([0, CANVAS_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT], isPortrait);
 
   return (
-    <Layer>
+    <Layer listening={false}>
       <Rect
         x={backgroundRect.x}
         y={backgroundRect.y}
