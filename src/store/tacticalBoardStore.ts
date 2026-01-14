@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { Player } from '@/types/player';
 import { Ball } from '@/types/ball';
 import { Shape } from '@/types/shape';
+import { CANVAS_WIDTH } from '@/constants/field';
+import { useAnimationStore } from '@/store/animationStore';
 
 type Snapshot = {
   players: Player[];
@@ -24,6 +26,92 @@ const createSnapshot = (state: TacticalBoardState): Snapshot => ({
   balls: cloneBalls(state.balls),
   shapes: cloneShapes(state.shapes),
 });
+
+const rotatePoint = (x: number, y: number, clockwise: boolean) => {
+  if (clockwise) {
+    return { x: y, y: CANVAS_WIDTH - x };
+  }
+  return { x: CANVAS_WIDTH - y, y: x };
+};
+
+const rotateRect = (x: number, y: number, width: number, height: number, clockwise: boolean) => {
+  const corners = [
+    { x, y },
+    { x: x + width, y },
+    { x: x + width, y: y + height },
+    { x, y: y + height },
+  ].map((corner) => rotatePoint(corner.x, corner.y, clockwise));
+
+  const xs = corners.map((corner) => corner.x);
+  const ys = corners.map((corner) => corner.y);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY = Math.max(...ys);
+
+  return { x: minX, y: minY, width: maxX - minX, height: maxY - minY };
+};
+
+const rotateShapePoints = (shape: Shape, clockwise: boolean) => {
+  if (shape.type === 'rect' && shape.points.length === 4) {
+    const [x, y, width, height] = shape.points;
+    const rotated = rotateRect(x, y, width, height, clockwise);
+    return [rotated.x, rotated.y, rotated.width, rotated.height];
+  }
+
+  if (shape.type === 'circle' && shape.points.length === 3) {
+    const [x, y, radius] = shape.points;
+    const rotated = rotatePoint(x, y, clockwise);
+    return [rotated.x, rotated.y, radius];
+  }
+
+  if (shape.points.length % 2 === 0) {
+    const next: number[] = [];
+    for (let index = 0; index < shape.points.length; index += 2) {
+      const rotated = rotatePoint(shape.points[index], shape.points[index + 1], clockwise);
+      next.push(rotated.x, rotated.y);
+    }
+    return next;
+  }
+
+  return shape.points;
+};
+
+const rotatePlayers = (players: Player[], clockwise: boolean) =>
+  players.map((player) => {
+    const rotated = rotatePoint(player.x, player.y, clockwise);
+    return { ...player, x: rotated.x, y: rotated.y };
+  });
+
+const rotateBalls = (balls: Ball[], clockwise: boolean) =>
+  balls.map((ball) => {
+    const rotated = rotatePoint(ball.x, ball.y, clockwise);
+    return { ...ball, x: rotated.x, y: rotated.y };
+  });
+
+const rotateShapes = (shapes: Shape[], clockwise: boolean) =>
+  shapes.map((shape) => ({
+    ...shape,
+    points: rotateShapePoints(shape, clockwise),
+  }));
+
+const rotateAnimations = (clockwise: boolean) => {
+  const animationStore = useAnimationStore.getState();
+  if (animationStore.animations.length === 0) {
+    return;
+  }
+
+  const nextAnimations = animationStore.animations.map((animation) => ({
+    ...animation,
+    keyframes: animation.keyframes.map((frame) => ({
+      ...frame,
+      players: rotatePlayers(frame.players, clockwise),
+      shapes: rotateShapes(frame.shapes, clockwise),
+    })),
+  }));
+
+  animationStore.setAnimations(nextAnimations);
+};
 
 interface TacticalBoardState {
   players: Player[];
@@ -61,6 +149,7 @@ interface TacticalBoardState {
   toggleSelectedPlayer: (id: string) => void;
   clearSelection: () => void;
   clearPlayerSelection: () => void;
+  rotateBoard: (clockwise: boolean) => void;
   setZoom: (zoom: number) => void;
   setPan: (pan: { x: number; y: number }) => void;
   setGridVisible: (visible: boolean) => void;
@@ -236,6 +325,19 @@ export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
     }),
   clearSelection: () => set({ selectedObjectId: null, selectedPlayerIds: [] }),
   clearPlayerSelection: () => set({ selectedPlayerIds: [] }),
+  rotateBoard: (clockwise) =>
+    set((state) => {
+      rotateAnimations(clockwise);
+
+      return {
+        past: [...state.past, createSnapshot(state)],
+        future: [],
+        players: rotatePlayers(state.players, clockwise),
+        balls: rotateBalls(state.balls, clockwise),
+        shapes: rotateShapes(state.shapes, clockwise),
+        pan: { x: 0, y: 0 },
+      };
+    }),
   setZoom: (zoom) => set({ zoom }),
   setPan: (pan) => set({ pan }),
   setGridVisible: (visible) => set({ gridVisible: visible }),

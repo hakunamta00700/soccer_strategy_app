@@ -31,6 +31,7 @@ function ToolsTab() {
     setPathVisible,
     selectedObjectId,
     removeSelectedObject,
+    rotateBoard,
     undo,
     redo,
     past,
@@ -121,7 +122,13 @@ function ToolsTab() {
         <h3 className="text-sm font-medium text-gray-300 mb-2">보드 방향</h3>
         <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => setBoardOrientation('landscape')}
+            onClick={() => {
+              if (boardOrientation === 'landscape') {
+                return;
+              }
+              rotateBoard(false);
+              setBoardOrientation('landscape');
+            }}
             className={`px-2 py-2 rounded text-xs ${
               boardOrientation === 'landscape'
                 ? 'bg-primary-600 text-white'
@@ -131,7 +138,13 @@ function ToolsTab() {
             가로
           </button>
           <button
-            onClick={() => setBoardOrientation('portrait')}
+            onClick={() => {
+              if (boardOrientation === 'portrait') {
+                return;
+              }
+              rotateBoard(true);
+              setBoardOrientation('portrait');
+            }}
             className={`px-2 py-2 rounded text-xs ${
               boardOrientation === 'portrait'
                 ? 'bg-primary-600 text-white'

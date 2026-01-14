@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Stage, Layer, Rect, Group } from 'react-konva';
+import { Stage, Layer, Rect } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 import BackgroundLayer from './layers/BackgroundLayer';
@@ -47,19 +47,6 @@ function TacticalBoard() {
   const isPortrait = boardOrientation === 'portrait';
   const stageWidth = (isPortrait ? CANVAS_HEIGHT : CANVAS_WIDTH) * zoom;
   const stageHeight = (isPortrait ? CANVAS_WIDTH : CANVAS_HEIGHT) * zoom;
-  const boardTransform = isPortrait
-    ? { rotation: -90, x: 0, y: CANVAS_WIDTH }
-    : { rotation: 0, x: 0, y: 0 };
-
-  const toBoardCoords = (pos: { x: number; y: number }) => {
-    if (!isPortrait) {
-      return { x: pos.x, y: pos.y };
-    }
-    return {
-      x: CANVAS_WIDTH - pos.y,
-      y: pos.x,
-    };
-  };
 
   const handleStageClick = (e: any) => {
     if (selectionDragged.current) {
@@ -70,15 +57,13 @@ function TacticalBoard() {
     if (activeTool && !isDrawing) {
       setIsDrawing(true);
       const pos = e.target.getStage().getPointerPosition();
-      const boardPos = toBoardCoords(pos);
-      const startX = snapValue(boardPos.x - pan.x, snapToGrid);
-      const startY = snapValue(boardPos.y - pan.y, snapToGrid);
+      const startX = snapValue(pos.x - pan.x, snapToGrid);
+      const startY = snapValue(pos.y - pan.y, snapToGrid);
       setDrawingPoints([startX, startY]);
     } else if (isDrawing) {
       const pos = e.target.getStage().getPointerPosition();
-      const boardPos = toBoardCoords(pos);
-      const endX = snapValue(boardPos.x - pan.x, snapToGrid);
-      const endY = snapValue(boardPos.y - pan.y, snapToGrid);
+      const endX = snapValue(pos.x - pan.x, snapToGrid);
+      const endY = snapValue(pos.y - pan.y, snapToGrid);
 
       if (activeTool === 'rect') {
         const newShape: Shape = {
@@ -245,32 +230,22 @@ function TacticalBoard() {
           onMouseUp={handleStageMouseUp}
           onDblClick={handleDoubleClick}
         >
-          <BackgroundLayer transform={boardTransform} />
-          <ShapeLayer
-            drawingPoints={drawingPoints}
-            activeTool={activeTool}
-            transform={boardTransform}
-          />
-          <PathLayer transform={boardTransform} />
-          <BallLayer transform={boardTransform} />
-          <PlayerLayer transform={boardTransform} />
+          <BackgroundLayer />
+          <ShapeLayer drawingPoints={drawingPoints} activeTool={activeTool} />
+          <PathLayer />
+          <BallLayer />
+          <PlayerLayer />
           {selectionBox && (
             <Layer>
-              <Group
-                rotation={boardTransform.rotation}
-                x={boardTransform.x}
-                y={boardTransform.y}
-              >
-                <Rect
-                  x={selectionBox.x}
-                  y={selectionBox.y}
-                  width={selectionBox.width}
-                  height={selectionBox.height}
-                  fill="rgba(59, 130, 246, 0.15)"
-                  stroke="#3b82f6"
-                  dash={[6, 4]}
-                />
-              </Group>
+              <Rect
+                x={selectionBox.x}
+                y={selectionBox.y}
+                width={selectionBox.width}
+                height={selectionBox.height}
+                fill="rgba(59, 130, 246, 0.15)"
+                stroke="#3b82f6"
+                dash={[6, 4]}
+              />
             </Layer>
           )}
         </Stage>
