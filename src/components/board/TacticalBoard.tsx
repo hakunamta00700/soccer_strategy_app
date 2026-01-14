@@ -18,7 +18,6 @@ function TacticalBoard() {
     players,
     selectedPlayerIds,
     setSelectedPlayers,
-    setSelectedObject,
     addShape,
     snapToGrid,
     clearSelection,
@@ -54,14 +53,79 @@ function TacticalBoard() {
       return;
     }
 
+    if (!activeTool && e.target === e.target.getStage()) {
+      clearSelection();
+    }
+  };
+
+  const handleStageMouseDown = (e: any) => {
     if (activeTool && !isDrawing) {
-      setIsDrawing(true);
       const pos = e.target.getStage().getPointerPosition();
+      if (!pos) {
+        return;
+      }
       const startX = snapValue(pos.x - pan.x, snapToGrid);
       const startY = snapValue(pos.y - pan.y, snapToGrid);
+      setIsDrawing(true);
       setDrawingPoints([startX, startY]);
-    } else if (isDrawing) {
+      return;
+    }
+
+    if (isDrawing || e.target !== e.target.getStage()) {
+      return;
+    }
+
+    const pos = e.target.getStage().getPointerPosition();
+    if (!pos) {
+      return;
+    }
+
+    const startX = pos.x / zoom;
+    const startY = pos.y / zoom;
+    selectionStart.current = { x: startX, y: startY };
+    selectionActive.current = true;
+    selectionDragged.current = false;
+    setSelectionBox({ x: startX, y: startY, width: 0, height: 0 });
+  };
+
+  const handleStageMouseMove = (e: any) => {
+    if (isDrawing && activeTool) {
       const pos = e.target.getStage().getPointerPosition();
+      if (!pos) {
+        return;
+      }
+      const nextX = snapValue(pos.x - pan.x, snapToGrid);
+      const nextY = snapValue(pos.y - pan.y, snapToGrid);
+      setDrawingPoints([drawingPoints[0], drawingPoints[1], nextX, nextY]);
+      return;
+    }
+
+    if (selectionActive.current) {
+      const pos = e.target.getStage().getPointerPosition();
+      if (!pos || !selectionStart.current) {
+        return;
+      }
+
+      const endX = pos.x / zoom;
+      const endY = pos.y / zoom;
+      const start = selectionStart.current;
+      const x = Math.min(start.x, endX);
+      const y = Math.min(start.y, endY);
+      const width = Math.abs(endX - start.x);
+      const height = Math.abs(endY - start.y);
+      if (width > 2 || height > 2) {
+        selectionDragged.current = true;
+      }
+      setSelectionBox({ x, y, width, height });
+    }
+  };
+
+  const handleStageMouseUp = (e: any) => {
+    if (isDrawing && activeTool && drawingPoints.length >= 2) {
+      const pos = e.target.getStage().getPointerPosition();
+      if (!pos) {
+        return;
+      }
       const endX = snapValue(pos.x - pan.x, snapToGrid);
       const endY = snapValue(pos.y - pan.y, snapToGrid);
 
@@ -79,8 +143,6 @@ function TacticalBoard() {
           strokeWidth: 2,
         };
         addShape(newShape);
-        setIsDrawing(false);
-        setDrawingPoints([]);
       } else if (activeTool === 'circle') {
         const radius = Math.sqrt(
           Math.pow(endX - drawingPoints[0], 2) + Math.pow(endY - drawingPoints[1], 2)
@@ -93,8 +155,6 @@ function TacticalBoard() {
           strokeWidth: 2,
         };
         addShape(newShape);
-        setIsDrawing(false);
-        setDrawingPoints([]);
       } else if (activeTool === 'line' || activeTool === 'arrow') {
         const newShape: Shape = {
           id: `shape-${Date.now()}`,
@@ -107,78 +167,13 @@ function TacticalBoard() {
           pointerWidth: activeTool === 'arrow' ? arrowPointerWidth : undefined,
         };
         addShape(newShape);
-        setIsDrawing(false);
-        setDrawingPoints([]);
       }
-    } else {
-      if (e.target === e.target.getStage()) {
-        clearSelection();
-      } else {
-        setSelectedObject(null);
-      }
-    }
-  };
 
-  const handleStageMouseDown = (e: any) => {
-    if (activeTool || isDrawing) {
+      setIsDrawing(false);
+      setDrawingPoints([]);
       return;
     }
 
-    if (e.target !== e.target.getStage()) {
-      return;
-    }
-
-    const pos = e.target.getStage().getPointerPosition();
-    if (!pos) {
-      return;
-    }
-
-    const boardPos = toBoardCoords({ x: pos.x / zoom, y: pos.y / zoom });
-    const startX = boardPos.x;
-    const startY = boardPos.y;
-    selectionStart.current = { x: startX, y: startY };
-    selectionActive.current = true;
-    selectionDragged.current = false;
-    setSelectionBox({ x: startX, y: startY, width: 0, height: 0 });
-  };
-
-  const handleStageMouseMove = (e: any) => {
-    if (selectionActive.current) {
-      const pos = e.target.getStage().getPointerPosition();
-      if (!pos || !selectionStart.current) {
-        return;
-      }
-
-      const boardPos = toBoardCoords({ x: pos.x / zoom, y: pos.y / zoom });
-      const endX = boardPos.x;
-      const endY = boardPos.y;
-      const start = selectionStart.current;
-      const x = Math.min(start.x, endX);
-      const y = Math.min(start.y, endY);
-      const width = Math.abs(endX - start.x);
-      const height = Math.abs(endY - start.y);
-      if (width > 2 || height > 2) {
-        selectionDragged.current = true;
-      }
-      setSelectionBox({ x, y, width, height });
-      return;
-    }
-
-    if (isDrawing && activeTool) {
-      const pos = e.target.getStage().getPointerPosition();
-      const boardPos = toBoardCoords(pos);
-      const nextX = snapValue(boardPos.x - pan.x, snapToGrid);
-      const nextY = snapValue(boardPos.y - pan.y, snapToGrid);
-      setDrawingPoints([
-        drawingPoints[0],
-        drawingPoints[1],
-        nextX,
-        nextY,
-      ]);
-    }
-  };
-
-  const handleStageMouseUp = (e: any) => {
     if (!selectionActive.current) {
       return;
     }
