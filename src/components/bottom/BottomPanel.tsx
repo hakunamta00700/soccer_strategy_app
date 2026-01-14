@@ -1,16 +1,15 @@
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { Ball } from '@/types/ball';
-import { Player } from '@/types/player';
 import AnimationPanel from './AnimationPanel';
+import { useUIStore } from '@/store/uiStore';
 
 function BottomPanel() {
+  const { animationPanelVisible } = useUIStore();
   const {
     selectedObjectId,
     players,
     balls,
     shapes,
-    selectedPlayerIds,
-    updatePlayer,
     updateBall,
     updateShape,
     removeSelectedObject,
@@ -20,11 +19,7 @@ function BottomPanel() {
   const selectedShape = shapes.find((shape) => shape.id === selectedObjectId);
 
   if (!selectedObjectId || (!selectedPlayer && !selectedBall && !selectedShape)) {
-    return <AnimationPanel />;
-  }
-
-  if (selectedPlayerIds.length > 1) {
-    return <AnimationPanel />;
+    return animationPanelVisible ? <AnimationPanel /> : null;
   }
 
   if (selectedShape && selectedShape.type === 'arrow') {
@@ -194,109 +189,7 @@ function BottomPanel() {
     );
   }
 
-  if (!selectedPlayer) {
-    return <AnimationPanel />;
-  }
-
-  const handlePlayerUpdate = (field: keyof Player, value: Player[keyof Player]) => {
-    updatePlayer(selectedPlayer.id, { [field]: value });
-  };
-
-  return (
-    <div className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: selectedPlayer.color }} />
-        <h3 className="text-sm font-medium text-white">
-          선수 #{selectedPlayer.number} {selectedPlayer.name}
-        </h3>
-      </div>
-
-      <div className="grid grid-cols-4 gap-4">
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">등번호</label>
-          <input
-            type="number"
-            value={selectedPlayer.number}
-            onChange={(e) => handlePlayerUpdate('number', parseInt(e.target.value, 10))}
-            className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">이름</label>
-          <input
-            type="text"
-            value={selectedPlayer.name}
-            onChange={(e) => handlePlayerUpdate('name', e.target.value)}
-            className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">포지션</label>
-          <select
-            value={selectedPlayer.position}
-            onChange={(e) => handlePlayerUpdate('position', e.target.value)}
-            className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
-          >
-            <option value="GK">GK</option>
-            <option value="DF">DF</option>
-            <option value="MF">MF</option>
-            <option value="FW">FW</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">색상</label>
-          <input
-            type="color"
-            value={selectedPlayer.color}
-            onChange={(e) => handlePlayerUpdate('color', e.target.value)}
-            className="w-full px-2 py-1 bg-gray-700 rounded text-sm h-8"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">X 위치</label>
-          <input
-            type="number"
-            value={Math.round(selectedPlayer.x)}
-            onChange={(e) => handlePlayerUpdate('x', parseFloat(e.target.value))}
-            className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">Y 위치</label>
-          <input
-            type="number"
-            value={Math.round(selectedPlayer.y)}
-            onChange={(e) => handlePlayerUpdate('y', parseFloat(e.target.value))}
-            className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs text-gray-400 mb-1">회전</label>
-          <input
-            type="number"
-            value={selectedPlayer.rotation || 0}
-            onChange={(e) => handlePlayerUpdate('rotation', parseFloat(e.target.value))}
-            className="w-full px-2 py-1 bg-gray-700 text-white rounded text-sm"
-          />
-        </div>
-
-        <div className="flex items-end">
-          <button
-            onClick={removeSelectedObject}
-            className="w-full px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 transition-colors"
-          >
-            삭제
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return animationPanelVisible ? <AnimationPanel /> : null;
 }
 
 export default BottomPanel;

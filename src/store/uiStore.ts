@@ -6,6 +6,7 @@ export type ModalType = 'settings' | 'help' | 'sessionList' | null;
 export type StrokeStyle = 'solid' | 'dashed';
 export type PlayerViewMode = 'number' | 'photo';
 export type BoardOrientation = 'landscape' | 'portrait';
+export type PlayerInfoLocation = 'modal' | 'sidebar';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -16,6 +17,8 @@ interface UIState {
   playerViewMode: PlayerViewMode;
   positionFilter: Array<'GK' | 'DF' | 'MF' | 'FW'>;
   boardOrientation: BoardOrientation;
+  animationPanelVisible: boolean;
+  playerInfoLocation: PlayerInfoLocation;
   arrowColor: string;
   arrowStrokeWidth: number;
   arrowStyle: StrokeStyle;
@@ -35,6 +38,8 @@ interface UIState {
   setPlayerViewMode: (mode: PlayerViewMode) => void;
   setPositionFilter: (positions: Array<'GK' | 'DF' | 'MF' | 'FW'>) => void;
   setBoardOrientation: (orientation: BoardOrientation) => void;
+  setAnimationPanelVisible: (visible: boolean) => void;
+  setPlayerInfoLocation: (location: PlayerInfoLocation) => void;
   setArrowColor: (color: string) => void;
   setArrowStrokeWidth: (width: number) => void;
   setArrowStyle: (style: StrokeStyle) => void;
@@ -55,6 +60,8 @@ export const useUIStore = create<UIState>((set) => ({
   playerViewMode: 'number',
   positionFilter: ['GK', 'DF', 'MF', 'FW'],
   boardOrientation: 'landscape',
+  animationPanelVisible: true,
+  playerInfoLocation: 'sidebar',
   arrowColor: '#ffffff',
   arrowStrokeWidth: 2,
   arrowStyle: 'solid',
@@ -73,6 +80,8 @@ export const useUIStore = create<UIState>((set) => ({
   setPlayerViewMode: (mode) => set({ playerViewMode: mode }),
   setPositionFilter: (positions) => set({ positionFilter: positions }),
   setBoardOrientation: (orientation) => set({ boardOrientation: orientation }),
+  setAnimationPanelVisible: (visible) => set({ animationPanelVisible: visible }),
+  setPlayerInfoLocation: (location) => set({ playerInfoLocation: location }),
   setArrowColor: (color) => set({ arrowColor: color }),
   setArrowStrokeWidth: (width) => set({ arrowStrokeWidth: width }),
   setArrowStyle: (style) => set({ arrowStyle: style }),

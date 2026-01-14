@@ -6,9 +6,10 @@ import DevSeedAnimation from './components/DevSeedAnimation';
 import KeyboardShortcuts from './components/KeyboardShortcuts';
 import SettingsModal from './components/modals/SettingsModal';
 import { useUIStore } from './store/uiStore';
+import PlayerInfoPanel from './components/panels/PlayerInfoPanel';
 
 function App() {
-  const { modalOpen } = useUIStore();
+  const { modalOpen, playerInfoLocation } = useUIStore();
 
   return (
     <div className="flex flex-col h-screen bg-gray-900">
@@ -17,12 +18,16 @@ function App() {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col">
-          <TacticalBoard />
-          <BottomPanel />
+        <div className="flex-1 flex">
+          <div className="flex-1 flex flex-col">
+            <TacticalBoard />
+            <BottomPanel />
+          </div>
+          {playerInfoLocation === 'sidebar' && <PlayerInfoPanel variant="sidebar" />}
         </div>
       </div>
       {modalOpen === 'settings' && <SettingsModal />}
+      {playerInfoLocation === 'modal' && <PlayerInfoPanel variant="modal" />}
     </div>
   );
 }
