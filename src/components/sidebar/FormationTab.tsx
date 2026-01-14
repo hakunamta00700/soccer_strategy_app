@@ -120,6 +120,51 @@ function FormationTab() {
     setPlayersWithHistory(nextPlayers);
   };
 
+  const updateTeamPositions = (
+    updater: (player: Player, center: { x: number; y: number }) => Player
+  ) => {
+    if (teamPlayers.length === 0) {
+      return;
+    }
+
+    const center = teamPlayers.reduce(
+      (acc, player) => ({ x: acc.x + player.x, y: acc.y + player.y }),
+      { x: 0, y: 0 }
+    );
+    const centerPoint = {
+      x: center.x / teamPlayers.length,
+      y: center.y / teamPlayers.length,
+    };
+
+    const nextPlayers = players.map((player) =>
+      player.team === side ? updater(player, centerPoint) : player
+    );
+    setPlayersWithHistory(nextPlayers);
+  };
+
+  const scaleTeam = (scaleX: number, scaleY: number) => {
+    updateTeamPositions((player, center) => {
+      const nextX = center.x + (player.x - center.x) * scaleX;
+      const nextY = center.y + (player.y - center.y) * scaleY;
+      return {
+        ...player,
+        x: snapValue(nextX, snapToGrid),
+        y: snapValue(nextY, snapToGrid),
+      };
+    });
+  };
+
+  const moveTeam = (deltaX: number, deltaY: number) => {
+    updateTeamPositions((player) => ({
+      ...player,
+      x: snapValue(player.x + deltaX, snapToGrid),
+      y: snapValue(player.y + deltaY, snapToGrid),
+    }));
+  };
+
+  const MOVE_STEP = 10;
+  const SCALE_STEP = 0.9;
+
   return (
     <div className="space-y-4">
       <div>
@@ -157,6 +202,73 @@ function FormationTab() {
               {formation.name}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div>
+        <h3 className="text-sm font-medium text-gray-300 mb-2">배치 조정</h3>
+        <div className="bg-gray-700 p-3 rounded space-y-3">
+          <div>
+            <h4 className="text-xs text-gray-400 mb-2">간격 조절</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => scaleTeam(SCALE_STEP, 1)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                가로 좁히기
+              </button>
+              <button
+                onClick={() => scaleTeam(1 / SCALE_STEP, 1)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                가로 넓히기
+              </button>
+              <button
+                onClick={() => scaleTeam(1, SCALE_STEP)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                세로 좁히기
+              </button>
+              <button
+                onClick={() => scaleTeam(1, 1 / SCALE_STEP)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                세로 넓히기
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-xs text-gray-400 mb-2">위치 이동</h4>
+            <div className="grid grid-cols-3 gap-2">
+              <div />
+              <button
+                onClick={() => moveTeam(0, -MOVE_STEP)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                위로
+              </button>
+              <div />
+              <button
+                onClick={() => moveTeam(-MOVE_STEP, 0)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                왼쪽
+              </button>
+              <button
+                onClick={() => moveTeam(0, MOVE_STEP)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                아래로
+              </button>
+              <button
+                onClick={() => moveTeam(MOVE_STEP, 0)}
+                className="px-2 py-2 rounded text-xs bg-gray-600 text-gray-200 hover:bg-gray-500"
+              >
+                오른쪽
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
