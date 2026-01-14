@@ -1,4 +1,4 @@
-import { Layer, Rect, Line, Circle } from 'react-konva';
+import { Layer, Rect, Line, Circle, Group } from 'react-konva';
 import {
   CANVAS_WIDTH,
   CANVAS_HEIGHT,
@@ -12,7 +12,11 @@ import {
 } from '@/constants/field';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 
-function BackgroundLayer() {
+interface BackgroundLayerProps {
+  transform?: { rotation: number; x: number; y: number };
+}
+
+function BackgroundLayer({ transform }: BackgroundLayerProps) {
   const { gridVisible } = useTacticalBoardStore();
   const toPixel = (meters: number) => meters * PIXELS_PER_METER;
   const verticalLines = gridVisible
@@ -48,6 +52,7 @@ function BackgroundLayer() {
 
   return (
     <Layer>
+      <Group rotation={transform?.rotation ?? 0} x={transform?.x ?? 0} y={transform?.y ?? 0}>
       <Rect
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
@@ -187,6 +192,7 @@ function BackgroundLayer() {
         stroke={LINE_COLOR}
         strokeWidth={LINE_WIDTH}
       />
+      </Group>
     </Layer>
   );
 }

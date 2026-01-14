@@ -1,13 +1,14 @@
-import { Layer, Rect, Circle, Line, Arrow } from 'react-konva';
+import { Layer, Rect, Circle, Line, Arrow, Group } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 
 interface ShapeLayerProps {
   drawingPoints: number[];
   activeTool: string | null;
+  transform?: { rotation: number; x: number; y: number };
 }
 
-function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
+function ShapeLayer({ drawingPoints, activeTool, transform }: ShapeLayerProps) {
   const { shapes, selectedObjectId, setSelectedObject, clearPlayerSelection } =
     useTacticalBoardStore();
   const {
@@ -78,6 +79,7 @@ function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
 
   return (
     <Layer>
+      <Group rotation={transform?.rotation ?? 0} x={transform?.x ?? 0} y={transform?.y ?? 0}>
       {shapes.map((shape) => {
         const isSelected = selectedObjectId === shape.id;
         const stroke = isSelected ? '#facc15' : shape.color;
@@ -151,6 +153,7 @@ function ShapeLayer({ drawingPoints, activeTool }: ShapeLayerProps) {
         }
       })}
       {renderDrawingShape()}
+      </Group>
     </Layer>
   );
 }

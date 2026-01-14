@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Stage, Layer, Rect } from 'react-konva';
+import { Stage, Layer, Rect, Group } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 import BackgroundLayer from './layers/BackgroundLayer';
@@ -30,6 +30,7 @@ function TacticalBoard() {
     arrowStyle,
     arrowPointerLength,
     arrowPointerWidth,
+    boardOrientation,
   } = useUIStore();
 
   const [isDrawing, setIsDrawing] = useState(false);
@@ -43,6 +44,22 @@ function TacticalBoard() {
   const selectionStart = useRef<{ x: number; y: number } | null>(null);
   const selectionActive = useRef(false);
   const selectionDragged = useRef(false);
+  const isPortrait = boardOrientation === 'portrait';
+  const stageWidth = (isPortrait ? CANVAS_HEIGHT : CANVAS_WIDTH) * zoom;
+  const stageHeight = (isPortrait ? CANVAS_WIDTH : CANVAS_HEIGHT) * zoom;
+  const boardTransform = isPortrait
+    ? { rotation: -90, x: 0, y: CANVAS_WIDTH }
+    : { rotation: 0, x: 0, y: 0 };
+
+  const toBoardCoords = (pos: { x: number; y: number }) => {
+    if (!isPortrait) {
+      return { x: pos.x, y: pos.y };
+    }
+    return {
+      x: CANVAS_WIDTH - pos.y,
+      y: pos.x,
+    };
+  };
 
   const handleStageClick = (e: any) => {
     if (selectionDragged.current) {
@@ -53,13 +70,15 @@ function TacticalBoard() {
     if (activeTool && !isDrawing) {
       setIsDrawing(true);
       const pos = e.target.getStage().getPointerPosition();
-      const startX = snapValue(pos.x - pan.x, snapToGrid);
-      const startY = snapValue(pos.y - pan.y, snapToGrid);
+      const boardPos = toBoardCoords(pos);
+      const startX = snapValue(boardPos.x - pan.x, snapToGrid);
+      const startY = snapValue(boardPos.y - pan.y, snapToGrid);
       setDrawingPoints([startX, startY]);
     } else if (isDrawing) {
       const pos = e.target.getStage().getPointerPosition();
-      const endX = snapValue(pos.x - pan.x, snapToGrid);
-      const endY = snapValue(pos.y - pan.y, snapToGrid);
+      const boardPos = toBoardCoords(pos);
+      const endX = snapValue(boardPos.x - pan.x, snapToGrid);
+      const endY = snapValue(boardPos.y - pan.y, snapToGrid);
 
       if (activeTool === 'rect') {
         const newShape: Shape = {
@@ -129,8 +148,9 @@ function TacticalBoard() {
       return;
     }
 
-    const startX = pos.x / zoom;
-    const startY = pos.y / zoom;
+    const boardPos = toBoardCoords({ x: pos.x / zoom, y: pos.y / zoom });
+    const startX = boardPos.x;
+    const startY = boardPos.y;
     selectionStart.current = { x: startX, y: startY };
     selectionActive.current = true;
     selectionDragged.current = false;
@@ -144,8 +164,9 @@ function TacticalBoard() {
         return;
       }
 
-      const endX = pos.x / zoom;
-      const endY = pos.y / zoom;
+      const boardPos = toBoardCoords({ x: pos.x / zoom, y: pos.y / zoom });
+      const endX = boardPos.x;
+      const endY = boardPos.y;
       const start = selectionStart.current;
       const x = Math.min(start.x, endX);
       const y = Math.min(start.y, endY);
@@ -160,8 +181,9 @@ function TacticalBoard() {
 
     if (isDrawing && activeTool) {
       const pos = e.target.getStage().getPointerPosition();
-      const nextX = snapValue(pos.x - pan.x, snapToGrid);
-      const nextY = snapValue(pos.y - pan.y, snapToGrid);
+      const boardPos = toBoardCoords(pos);
+      const nextX = snapValue(boardPos.x - pan.x, snapToGrid);
+      const nextY = snapValue(boardPos.y - pan.y, snapToGrid);
       setDrawingPoints([
         drawingPoints[0],
         drawingPoints[1],
@@ -213,8 +235,8 @@ function TacticalBoard() {
     <div className="flex-1 bg-gray-900 relative overflow-hidden">
       <div className="absolute inset-0 flex items-center justify-center">
         <Stage
-          width={CANVAS_WIDTH * zoom}
-          height={CANVAS_HEIGHT * zoom}
+          width={stageWidth}
+          height={stageHeight}
           scaleX={zoom}
           scaleY={zoom}
           onClick={handleStageClick}
@@ -223,22 +245,32 @@ function TacticalBoard() {
           onMouseUp={handleStageMouseUp}
           onDblClick={handleDoubleClick}
         >
-          <BackgroundLayer />
-          <ShapeLayer drawingPoints={drawingPoints} activeTool={activeTool} />
-          <PathLayer />
-          <BallLayer />
-          <PlayerLayer />
+          <BackgroundLayer transform={boardTransform} />
+          <ShapeLayer
+            drawingPoints={drawingPoints}
+            activeTool={activeTool}
+            transform={boardTransform}
+          />
+          <PathLayer transform={boardTransform} />
+          <BallLayer transform={boardTransform} />
+          <PlayerLayer transform={boardTransform} />
           {selectionBox && (
             <Layer>
-              <Rect
-                x={selectionBox.x}
-                y={selectionBox.y}
-                width={selectionBox.width}
-                height={selectionBox.height}
-                fill="rgba(59, 130, 246, 0.15)"
-                stroke="#3b82f6"
-                dash={[6, 4]}
-              />
+              <Group
+                rotation={boardTransform.rotation}
+                x={boardTransform.x}
+                y={boardTransform.y}
+              >
+                <Rect
+                  x={selectionBox.x}
+                  y={selectionBox.y}
+                  width={selectionBox.width}
+                  height={selectionBox.height}
+                  fill="rgba(59, 130, 246, 0.15)"
+                  stroke="#3b82f6"
+                  dash={[6, 4]}
+                />
+              </Group>
             </Layer>
           )}
         </Stage>

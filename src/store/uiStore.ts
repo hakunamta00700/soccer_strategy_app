@@ -5,6 +5,7 @@ export type ToolType = 'arrow' | 'line' | 'rect' | 'circle' | 'text' | null;
 export type ModalType = 'settings' | 'help' | 'sessionList' | null;
 export type StrokeStyle = 'solid' | 'dashed';
 export type PlayerViewMode = 'number' | 'photo';
+export type BoardOrientation = 'landscape' | 'portrait';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -14,6 +15,7 @@ interface UIState {
   saveStatus: 'saved' | 'saving' | 'unsaved';
   playerViewMode: PlayerViewMode;
   positionFilter: Array<'GK' | 'DF' | 'MF' | 'FW'>;
+  boardOrientation: BoardOrientation;
   arrowColor: string;
   arrowStrokeWidth: number;
   arrowStyle: StrokeStyle;
@@ -28,6 +30,7 @@ interface UIState {
   setSaveStatus: (status: 'saved' | 'saving' | 'unsaved') => void;
   setPlayerViewMode: (mode: PlayerViewMode) => void;
   setPositionFilter: (positions: Array<'GK' | 'DF' | 'MF' | 'FW'>) => void;
+  setBoardOrientation: (orientation: BoardOrientation) => void;
   setArrowColor: (color: string) => void;
   setArrowStrokeWidth: (width: number) => void;
   setArrowStyle: (style: StrokeStyle) => void;
@@ -43,6 +46,7 @@ export const useUIStore = create<UIState>((set) => ({
   saveStatus: 'saved',
   playerViewMode: 'number',
   positionFilter: ['GK', 'DF', 'MF', 'FW'],
+  boardOrientation: 'landscape',
   arrowColor: '#ffffff',
   arrowStrokeWidth: 2,
   arrowStyle: 'solid',
@@ -56,6 +60,7 @@ export const useUIStore = create<UIState>((set) => ({
   setSaveStatus: (status) => set({ saveStatus: status }),
   setPlayerViewMode: (mode) => set({ playerViewMode: mode }),
   setPositionFilter: (positions) => set({ positionFilter: positions }),
+  setBoardOrientation: (orientation) => set({ boardOrientation: orientation }),
   setArrowColor: (color) => set({ arrowColor: color }),
   setArrowStrokeWidth: (width) => set({ arrowStrokeWidth: width }),
   setArrowStyle: (style) => set({ arrowStyle: style }),

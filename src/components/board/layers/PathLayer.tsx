@@ -1,4 +1,4 @@
-import { Layer, Line, Circle } from 'react-konva';
+import { Layer, Line, Circle, Group } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useAnimationStore } from '@/store/animationStore';
 import { Player } from '@/types/player';
@@ -30,7 +30,11 @@ const buildPlayerPaths = (playersByFrame: Player[][]) => {
   return paths;
 };
 
-function PathLayer() {
+interface PathLayerProps {
+  transform?: { rotation: number; x: number; y: number };
+}
+
+function PathLayer({ transform }: PathLayerProps) {
   const { pathVisible } = useTacticalBoardStore();
   const { animations } = useAnimationStore();
 
@@ -44,6 +48,7 @@ function PathLayer() {
 
   return (
     <Layer>
+      <Group rotation={transform?.rotation ?? 0} x={transform?.x ?? 0} y={transform?.y ?? 0}>
       {Object.entries(paths).map(([playerId, points]) => {
         if (points.length < 2) {
           return null;
@@ -72,6 +77,7 @@ function PathLayer() {
           />
         ))
       )}
+      </Group>
     </Layer>
   );
 }

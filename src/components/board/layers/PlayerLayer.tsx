@@ -1,11 +1,15 @@
-import { Layer } from 'react-konva';
+import { Layer, Group } from 'react-konva';
 import { useRef } from 'react';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 import { snapValue } from '@/utils/grid';
 import PlayerIcon from '../PlayerIcon';
 
-function PlayerLayer() {
+interface PlayerLayerProps {
+  transform?: { rotation: number; x: number; y: number };
+}
+
+function PlayerLayer({ transform }: PlayerLayerProps) {
   const {
     players,
     selectedObjectId,
@@ -131,7 +135,8 @@ function PlayerLayer() {
 
   return (
     <Layer>
-      {players
+      <Group rotation={transform?.rotation ?? 0} x={transform?.x ?? 0} y={transform?.y ?? 0}>
+        {players
         .filter((player) => positionFilter.includes(player.position))
         .map((player) => (
           <PlayerIcon
@@ -147,6 +152,7 @@ function PlayerLayer() {
             onDragEnd={handleDragEnd(player.id)}
           />
         ))}
+      </Group>
     </Layer>
   );
 }
