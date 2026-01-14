@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Stage } from 'react-konva';
+import { useRef, useState } from 'react';
+import { Stage, Layer, Rect } from 'react-konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
 import { useUIStore } from '@/store/uiStore';
 import BackgroundLayer from './layers/BackgroundLayer';
@@ -12,8 +12,17 @@ import { Shape } from '@/types/shape';
 import { snapValue } from '@/utils/grid';
 
 function TacticalBoard() {
-  const { zoom, pan, setSelectedObject, addShape, snapToGrid, clearSelection } =
-    useTacticalBoardStore();
+  const {
+    zoom,
+    pan,
+    players,
+    selectedPlayerIds,
+    setSelectedPlayers,
+    setSelectedObject,
+    addShape,
+    snapToGrid,
+    clearSelection,
+  } = useTacticalBoardStore();
   const {
     activeTool,
     arrowColor,
@@ -25,8 +34,22 @@ function TacticalBoard() {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [drawingPoints, setDrawingPoints] = useState<number[]>([]);
+  const [selectionBox, setSelectionBox] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+  const selectionStart = useRef<{ x: number; y: number } | null>(null);
+  const selectionActive = useRef(false);
+  const selectionDragged = useRef(false);
 
   const handleStageClick = (e: any) => {
+    if (selectionDragged.current) {
+      selectionDragged.current = false;
+      return;
+    }
+
     if (activeTool && !isDrawing) {
       setIsDrawing(true);
       const pos = e.target.getStage().getPointerPosition();
@@ -92,7 +115,49 @@ function TacticalBoard() {
     }
   };
 
+  const handleStageMouseDown = (e: any) => {
+    if (activeTool || isDrawing) {
+      return;
+    }
+
+    if (e.target !== e.target.getStage()) {
+      return;
+    }
+
+    const pos = e.target.getStage().getPointerPosition();
+    if (!pos) {
+      return;
+    }
+
+    const startX = pos.x / zoom;
+    const startY = pos.y / zoom;
+    selectionStart.current = { x: startX, y: startY };
+    selectionActive.current = true;
+    selectionDragged.current = false;
+    setSelectionBox({ x: startX, y: startY, width: 0, height: 0 });
+  };
+
   const handleStageMouseMove = (e: any) => {
+    if (selectionActive.current) {
+      const pos = e.target.getStage().getPointerPosition();
+      if (!pos || !selectionStart.current) {
+        return;
+      }
+
+      const endX = pos.x / zoom;
+      const endY = pos.y / zoom;
+      const start = selectionStart.current;
+      const x = Math.min(start.x, endX);
+      const y = Math.min(start.y, endY);
+      const width = Math.abs(endX - start.x);
+      const height = Math.abs(endY - start.y);
+      if (width > 2 || height > 2) {
+        selectionDragged.current = true;
+      }
+      setSelectionBox({ x, y, width, height });
+      return;
+    }
+
     if (isDrawing && activeTool) {
       const pos = e.target.getStage().getPointerPosition();
       const nextX = snapValue(pos.x - pan.x, snapToGrid);
@@ -104,6 +169,38 @@ function TacticalBoard() {
         nextY,
       ]);
     }
+  };
+
+  const handleStageMouseUp = (e: any) => {
+    if (!selectionActive.current) {
+      return;
+    }
+
+    selectionActive.current = false;
+    const currentBox = selectionBox;
+    setSelectionBox(null);
+
+    if (!currentBox || currentBox.width < 4 || currentBox.height < 4) {
+      selectionStart.current = null;
+      return;
+    }
+
+    const selected = players.filter((player) => {
+      const withinX = player.x >= currentBox.x && player.x <= currentBox.x + currentBox.width;
+      const withinY = player.y >= currentBox.y && player.y <= currentBox.y + currentBox.height;
+      return withinX && withinY;
+    });
+
+    const ids = selected.map((player) => player.id);
+    const isMulti = e?.evt?.shiftKey;
+    if (isMulti) {
+      const merged = Array.from(new Set([...selectedPlayerIds, ...ids]));
+      setSelectedPlayers(merged);
+    } else {
+      setSelectedPlayers(ids);
+    }
+
+    selectionStart.current = null;
   };
 
   const handleDoubleClick = () => {
@@ -121,7 +218,9 @@ function TacticalBoard() {
           scaleX={zoom}
           scaleY={zoom}
           onClick={handleStageClick}
+          onMouseDown={handleStageMouseDown}
           onMouseMove={handleStageMouseMove}
+          onMouseUp={handleStageMouseUp}
           onDblClick={handleDoubleClick}
         >
           <BackgroundLayer />
@@ -129,6 +228,19 @@ function TacticalBoard() {
           <PathLayer />
           <BallLayer />
           <PlayerLayer />
+          {selectionBox && (
+            <Layer>
+              <Rect
+                x={selectionBox.x}
+                y={selectionBox.y}
+                width={selectionBox.width}
+                height={selectionBox.height}
+                fill="rgba(59, 130, 246, 0.15)"
+                stroke="#3b82f6"
+                dash={[6, 4]}
+              />
+            </Layer>
+          )}
         </Stage>
       </div>
     </div>
