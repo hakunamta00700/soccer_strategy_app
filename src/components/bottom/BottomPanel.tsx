@@ -4,27 +4,23 @@ import { useUIStore } from '@/store/uiStore';
 
 function BottomPanel() {
   const { animationPanelEnabled } = useUIStore();
-  const {
-    selectedObjectId,
-    players,
-    balls,
-    shapes,
-    updateShape,
-    removeSelectedObject,
-  } = useTacticalBoardStore();
+  const { selectedObjectId, players, balls, shapes, updateShape, removeSelectedObject } =
+    useTacticalBoardStore();
   const selectedPlayer = players.find((p) => p.id === selectedObjectId);
   const selectedBall = balls.find((ball) => ball.id === selectedObjectId);
   const selectedShape = shapes.find((shape) => shape.id === selectedObjectId);
 
-  if (!selectedObjectId || (!selectedPlayer && !selectedBall && !selectedShape)) {
-    return animationPanelEnabled ? <AnimationPanel /> : null;
+  const panels: React.ReactNode[] = [];
+
+  if (animationPanelEnabled) {
+    panels.push(<AnimationPanel key="animation" />);
   }
 
   if (selectedShape && selectedShape.type === 'arrow') {
     const dashStyle = selectedShape.dash ? 'dashed' : 'solid';
 
-    return (
-      <div className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
+    panels.push(
+      <div key="arrow-settings" className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-medium text-white">화살표 설정</h3>
           <button
@@ -108,8 +104,8 @@ function BottomPanel() {
   }
 
   if (selectedShape) {
-    return (
-      <div className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
+    panels.push(
+      <div key="shape-settings" className="h-[200px] bg-gray-800 border-t border-gray-700 p-4">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-300">선택된 도형: {selectedShape.type}</div>
           <button
@@ -127,7 +123,11 @@ function BottomPanel() {
     return null;
   }
 
-  return null;
+  if (panels.length === 0) {
+    return null;
+  }
+
+  return <div className="flex flex-col gap-0">{panels}</div>;
 }
 
 export default BottomPanel;
