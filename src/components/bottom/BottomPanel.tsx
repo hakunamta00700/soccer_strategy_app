@@ -4,9 +4,8 @@ import { useUIStore } from '@/store/uiStore';
 
 function BottomPanel() {
   const { animationPanelEnabled } = useUIStore();
-  const { selectedObjectId, players, balls, shapes, updateShape, removeSelectedObject } =
+  const { selectedObjectId, balls, shapes, updateShape, removeSelectedObject } =
     useTacticalBoardStore();
-  const selectedPlayer = players.find((p) => p.id === selectedObjectId);
   const selectedBall = balls.find((ball) => ball.id === selectedObjectId);
   const selectedShape = shapes.find((shape) => shape.id === selectedObjectId);
 

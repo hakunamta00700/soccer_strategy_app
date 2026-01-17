@@ -83,7 +83,7 @@ function PlayerLayer({ transform }: PlayerLayerProps) {
     }
   };
 
-  const handleDragStart = (playerId: string) => (x: number, y: number) => {
+  const handleDragStart = (playerId: string) => () => {
     const selection = selectedPlayerIds.includes(playerId)
       ? selectedPlayerIds
       : [playerId];
