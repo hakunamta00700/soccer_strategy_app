@@ -67,15 +67,22 @@ function App() {
       <SessionPersistence />
       <KeyboardShortcuts />
       <Header />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
         <Sidebar />
-        <div className="flex-1 flex">
-          <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+          <div className="flex-1 flex flex-col min-h-0">
             <TacticalBoard />
             <BottomPanel />
           </div>
           {playerInfoLocation === 'sidebar' && playerInfoVisible && (
-            <PlayerInfoPanel variant="sidebar" />
+            <>
+              <div className="hidden lg:block">
+                <PlayerInfoPanel variant="sidebar" />
+              </div>
+              <div className="lg:hidden">
+                <PlayerInfoPanel variant="modal" />
+              </div>
+            </>
           )}
         </div>
       </div>

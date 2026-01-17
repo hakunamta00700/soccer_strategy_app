@@ -34,9 +34,9 @@ function Header() {
   };
 
   return (
-    <header className="h-[60px] bg-gray-800 flex items-center justify-between px-6 border-b border-gray-700">
-      <div className="flex items-center gap-4">
-        <div className="text-xl font-bold text-white">⚽ 전술 보드</div>
+    <header className="min-h-[60px] bg-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-4 sm:px-6 py-2 border-b border-gray-700">
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="text-lg sm:text-xl font-bold text-white">⚽ 전술 보드</div>
         <button
           onClick={() => setModalOpen('sessionList')}
           className="text-gray-300 hover:text-white text-sm"
@@ -45,7 +45,7 @@ function Header() {
         </button>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4 flex-wrap justify-between sm:justify-end">
         <div className={`text-sm ${getSaveStatusColor()}`}>{getSaveStatusText()}</div>
         <button
           onClick={() => void saveCurrentSession('manual')}
