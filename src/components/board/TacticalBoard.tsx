@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
 import Konva from 'konva';
 import { useTacticalBoardStore } from '@/store/tacticalBoardStore';
@@ -52,14 +52,55 @@ function TacticalBoard() {
   const selectionActive = useRef(false);
   const selectionDragged = useRef(false);
   const stageRef = useRef<Konva.Stage>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const isPortrait = boardOrientation === 'portrait';
-  const stageWidth = (isPortrait ? CANVAS_HEIGHT : CANVAS_WIDTH) * zoom;
-  const stageHeight = (isPortrait ? CANVAS_WIDTH : CANVAS_HEIGHT) * zoom;
+  const [fitScale, setFitScale] = useState(1);
+  const stageBaseSize = useMemo(
+    () => ({
+      width: isPortrait ? CANVAS_HEIGHT : CANVAS_WIDTH,
+      height: isPortrait ? CANVAS_WIDTH : CANVAS_HEIGHT,
+    }),
+    [isPortrait]
+  );
+  const stageScale = fitScale * zoom;
 
   useEffect(() => {
     setBoardStage(stageRef.current);
     return () => setBoardStage(null);
   }, []);
+
+  useLayoutEffect(() => {
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const updateScale = () => {
+      const { width, height } = element.getBoundingClientRect();
+      const scale = Math.min(
+        1,
+        width / stageBaseSize.width,
+        height / stageBaseSize.height
+      );
+      setFitScale(Number.isFinite(scale) && scale > 0 ? scale : 1);
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [stageBaseSize]);
+
+  const getPointerPosition = (e: any) => {
+    const pos = e.target.getStage().getPointerPosition();
+    if (!pos) {
+      return null;
+    }
+    return {
+      x: pos.x / stageScale,
+      y: pos.y / stageScale,
+    };
+  };
 
   const handleStageClick = (e: any) => {
     if (selectionDragged.current) {
@@ -74,7 +115,7 @@ function TacticalBoard() {
 
   const handleStageMouseDown = (e: any) => {
     if (activeTool && !isDrawing) {
-      const pos = e.target.getStage().getPointerPosition();
+      const pos = getPointerPosition(e);
       if (!pos) {
         return;
       }
@@ -93,13 +134,13 @@ function TacticalBoard() {
       return;
     }
 
-    const pos = e.target.getStage().getPointerPosition();
+    const pos = getPointerPosition(e);
     if (!pos) {
       return;
     }
 
-    const startX = pos.x / zoom;
-    const startY = pos.y / zoom;
+    const startX = pos.x;
+    const startY = pos.y;
     selectionStart.current = { x: startX, y: startY };
     selectionActive.current = true;
     selectionDragged.current = false;
@@ -108,7 +149,7 @@ function TacticalBoard() {
 
   const handleStageMouseMove = (e: any) => {
     if (isDrawing && activeTool) {
-      const pos = e.target.getStage().getPointerPosition();
+      const pos = getPointerPosition(e);
       if (!pos) {
         return;
       }
@@ -129,13 +170,13 @@ function TacticalBoard() {
     }
 
     if (selectionActive.current) {
-      const pos = e.target.getStage().getPointerPosition();
+      const pos = getPointerPosition(e);
       if (!pos || !selectionStart.current) {
         return;
       }
 
-      const endX = pos.x / zoom;
-      const endY = pos.y / zoom;
+      const endX = pos.x;
+      const endY = pos.y;
       const start = selectionStart.current;
       const x = Math.min(start.x, endX);
       const y = Math.min(start.y, endY);
@@ -150,7 +191,7 @@ function TacticalBoard() {
 
   const handleStageMouseUp = (e: any) => {
     if (isDrawing && activeTool && drawingPoints.length >= 2) {
-      const pos = e.target.getStage().getPointerPosition();
+      const pos = getPointerPosition(e);
       if (!pos) {
         return;
       }
@@ -267,7 +308,11 @@ function TacticalBoard() {
   };
 
   return (
-    <div id="tactical-board" className="flex-1 bg-gray-900 relative overflow-hidden">
+    <div
+      id="tactical-board"
+      className="flex-1 bg-gray-900 relative overflow-hidden"
+      ref={containerRef}
+    >
       <div className="absolute top-3 left-3 z-10 flex items-center gap-3 text-xs text-gray-200 bg-gray-800/80 px-3 py-1 rounded">
         <span className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
@@ -281,10 +326,10 @@ function TacticalBoard() {
       <div className="absolute inset-0 flex items-center justify-center">
         <Stage
           ref={stageRef}
-          width={stageWidth}
-          height={stageHeight}
-          scaleX={zoom}
-          scaleY={zoom}
+          width={stageBaseSize.width}
+          height={stageBaseSize.height}
+          scaleX={stageScale}
+          scaleY={stageScale}
           onClick={handleStageClick}
           onMouseDown={handleStageMouseDown}
           onMouseMove={handleStageMouseMove}
