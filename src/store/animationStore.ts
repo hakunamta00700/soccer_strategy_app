@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { Animation } from '@/types/animation';
 
 interface AnimationState {
@@ -17,24 +18,26 @@ interface AnimationState {
   removeAnimation: (id: string) => void;
 }
 
-export const useAnimationStore = create<AnimationState>((set) => ({
-  isPlaying: false,
-  currentTime: 0,
-  playbackSpeed: 1,
-  animations: [],
+export const useAnimationStore = create<AnimationState>()(
+  subscribeWithSelector((set) => ({
+    isPlaying: false,
+    currentTime: 0,
+    playbackSpeed: 1,
+    animations: [],
 
-  setIsPlaying: (playing) => set({ isPlaying: playing }),
-  setCurrentTime: (time) => set({ currentTime: time }),
-  setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
-  setAnimations: (animations) => set({ animations }),
-  addAnimation: (animation) =>
-    set((state) => ({ animations: [...state.animations, animation] })),
-  updateAnimation: (id, updates) =>
-    set((state) => ({
-      animations: state.animations.map((a) =>
-        a.id === id ? { ...a, ...updates } : a
-      ),
-    })),
-  removeAnimation: (id) =>
-    set((state) => ({ animations: state.animations.filter((a) => a.id !== id) })),
-}));
+    setIsPlaying: (playing) => set({ isPlaying: playing }),
+    setCurrentTime: (time) => set({ currentTime: time }),
+    setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
+    setAnimations: (animations) => set({ animations }),
+    addAnimation: (animation) =>
+      set((state) => ({ animations: [...state.animations, animation] })),
+    updateAnimation: (id, updates) =>
+      set((state) => ({
+        animations: state.animations.map((a) =>
+          a.id === id ? { ...a, ...updates } : a
+        ),
+      })),
+    removeAnimation: (id) =>
+      set((state) => ({ animations: state.animations.filter((a) => a.id !== id) })),
+  }))
+);

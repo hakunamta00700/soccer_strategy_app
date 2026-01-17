@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 import { Player } from '@/types/player';
 import { Ball } from '@/types/ball';
 import { Shape } from '@/types/shape';
@@ -167,37 +168,38 @@ interface TacticalBoardState {
   setPathVisible: (visible: boolean) => void;
 }
 
-export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
-  players: [],
-  balls: [],
-  shapes: [],
-  selectedObjectId: null,
-  selectedPlayerIds: [],
-  fieldColor: FIELD_COLOR,
-  lineColor: LINE_COLOR,
-  homeColor: '#e63946',
-  awayColor: '#457b9d',
-  zoom: 1,
-  pan: { x: 0, y: 0 },
-  gridVisible: false,
-  snapToGrid: false,
-  pathVisible: false,
-  past: [],
-  future: [],
+export const useTacticalBoardStore = create<TacticalBoardState>()(
+  subscribeWithSelector((set) => ({
+    players: [],
+    balls: [],
+    shapes: [],
+    selectedObjectId: null,
+    selectedPlayerIds: [],
+    fieldColor: FIELD_COLOR,
+    lineColor: LINE_COLOR,
+    homeColor: '#e63946',
+    awayColor: '#457b9d',
+    zoom: 1,
+    pan: { x: 0, y: 0 },
+    gridVisible: false,
+    snapToGrid: false,
+    pathVisible: false,
+    past: [],
+    future: [],
 
-  addPlayer: (player) =>
-    set((state) => ({
-      past: [...state.past, createSnapshot(state)],
-      future: [],
-      players: [...state.players, player],
-    })),
-  updatePlayer: (id, updates) =>
-    set((state) => ({
-      past: [...state.past, createSnapshot(state)],
-      future: [],
-      players: state.players.map((p) => (p.id === id ? { ...p, ...updates } : p)),
-    })),
-  removePlayer: (id) =>
+    addPlayer: (player) =>
+      set((state) => ({
+        past: [...state.past, createSnapshot(state)],
+        future: [],
+        players: [...state.players, player],
+      })),
+    updatePlayer: (id, updates) =>
+      set((state) => ({
+        past: [...state.past, createSnapshot(state)],
+        future: [],
+        players: state.players.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+      })),
+    removePlayer: (id) =>
     set((state) => ({
       past: [...state.past, createSnapshot(state)],
       future: [],
@@ -390,4 +392,4 @@ export const useTacticalBoardStore = create<TacticalBoardState>((set) => ({
   setGridVisible: (visible) => set({ gridVisible: visible }),
   setSnapToGrid: (snap) => set({ snapToGrid: snap }),
   setPathVisible: (visible) => set({ pathVisible: visible }),
-}));
+})));
